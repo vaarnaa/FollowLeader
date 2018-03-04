@@ -30,7 +30,7 @@ object Game extends SimpleSwingApplication {
 
         // vaihdetaan piirtoväriksi valkoinen ja pyydetään avaruutta pirtämään itsensä
         g.setColor(Color.white)
-        //World.draw(g) 
+        World.draw(g) 
       }
       
     }
