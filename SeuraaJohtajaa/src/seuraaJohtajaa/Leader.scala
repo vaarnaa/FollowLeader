@@ -14,17 +14,22 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
   
   override def draw(g: Graphics2D) = {
     val angle = {
-      if (place.x == 0 && place.y == 0) 0
-      else if (place.x == 0 && place.y > 0) Math.PI / 2
-      else if (place.x == 0 && place.y < 0) -Math.PI / 2
-      else  Math.atan(place.y / place.x)
+      if (velocity.x == 0 && velocity.y == 0) 0
+      else if (velocity.x == 0 && velocity.y > 0) Math.PI / 2
+      else if (velocity.x == 0 && velocity.y < 0) Math.PI / 2
+      else if (velocity.x < 0 && velocity.y < 0)  Math.atan(velocity.y / velocity.x) + Math.PI
+      else if (velocity.x < 0 && velocity.y > 0)  Math.atan(velocity.y / velocity.x) + Math.PI
+      else Math.atan(velocity.y / velocity.x)
     }
+    println()
     val oldTransform = g.getTransform()
-    val at = new AffineTransform()
+    //val newTransform = oldTransform.clone().asInstanceOf[AffineTransform]
+    val at = new AffineTransform() 
     
     at.setToRotation(angle, place.x, place.y);
     g.setTransform(at)
     g.drawImage(this.img, null, place.x.toInt, (place.y.toInt))
+    g.setTransform(oldTransform);
   }
   
   override def move() {
