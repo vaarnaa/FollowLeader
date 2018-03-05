@@ -5,18 +5,22 @@ import java.awt.Graphics2D
 import java.io._
 import javax.imageio.ImageIO
 
-object World {
+class World() {
   
   val ships = Buffer[Ship]()
   
-  val shipImg = ImageIO.read(new File("alus1.jpg"))
+  val shipImg = ImageIO.read(new File("alus2.png"))
   
-  val leader = new Leader(100, Vector2D(0.5,0.5), Vector2D(100,100), shipImg)
+  val leader = new Leader(100, Vector2D(0.5,0.5), Vector2D(200,200), shipImg)
   
   ships += leader
   
   // Avaruuden piirtäminen on asteroidien piirtämistä
   def draw(g: Graphics2D) {
     ships foreach (_.draw(g))
+  }
+  
+  def step() = {
+    ships.foreach(_.move())
   }
 }
