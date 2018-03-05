@@ -10,7 +10,15 @@ case class Vector2D(x: Double, y: Double) {
   
   //miinustetaan vektori toisesta vektorista
   def - (other: Vector2D) = {
-    Vector2D(x + other.x, y + other.y)    
+    Vector2D(x - other.x, y - other.y)    
+  }
+  
+  def * (k: Double): Vector2D = {
+    return Vector2D(x * k, y * k) 
+  }
+  
+  def sizeOf() = {
+    Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2))
   }
   
 }

@@ -4,6 +4,7 @@ import scala.swing._
 import java.awt.{Color, BasicStroke, Graphics2D, RenderingHints}
 import scala.collection.mutable.Buffer
 import java.awt.event.ActionListener
+import java.awt.geom.Ellipse2D
 
 object Game extends SimpleSwingApplication {
   
@@ -33,9 +34,12 @@ object Game extends SimpleSwingApplication {
         // Pyydetään graphics:ilta siloiteltua grafiikkaa ns. antialiasointia
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)          
 
-        // vaihdetaan piirtoväriksi valkoinen ja piirretään pelimaailma
-        //g.setColor(Color.white)
+        // Piirretään pelimaailma
+        g.setColor(Color.red);
+        val targetCircle = new Ellipse2D.Double(gameWorld.target.x - 8, gameWorld.target.y - 8, 2.0 * 8, 2.0 * 8)
+        g.draw(targetCircle);
         gameWorld.draw(g)
+        
         
       }
       
