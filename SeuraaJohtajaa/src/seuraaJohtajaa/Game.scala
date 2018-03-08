@@ -11,7 +11,7 @@ object Game extends SimpleSwingApplication {
   val width      = 800
   val height     = 800
   
-  val gameWorld = new World()
+  val gameWorld = new World(height, width)
   
   def top = new MainFrame {
     
@@ -56,6 +56,7 @@ object Game extends SimpleSwingApplication {
     
     val timer = new javax.swing.Timer(6, listener)
     timer.start()
+    
     
   }
   
