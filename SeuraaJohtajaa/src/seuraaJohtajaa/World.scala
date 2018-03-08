@@ -9,15 +9,37 @@ import java.awt.event.ActionListener
 
 class World(val height: Int, val width: Int) {
   
-  val ships = Buffer[Ship]()
+  val followers = Buffer[Follower]()
   
   val imgLeader = ImageIO.read(new File("alus_musta.png"))
+  val imgFollower = ImageIO.read(new File("alus2.png"))
   
   var target = Vector2D(300, 500)
   
   val leader = new Leader(this, 70, Vector2D(0,0), Vector2D(300,300), imgLeader)
   
-  val follower = new Leader(this, 50, Vector2D(-1,-1), Vector2D(100,100), imgLeader)
+  //lisätään kolme followeria satunnaisilla aloituspaikoilla ja -nopeuksilla
+  for( x <- 0 until 3 ){
+   val x = util.Random.nextDouble
+   val y = util.Random.nextDouble
+   followers += new Follower(
+      this,
+      70,
+      Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
+      Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
+      imgFollower)
+}
+  
+  /*val follower = new Follower(
+      this,
+      70,
+      Vector2D(util.Random.nextDouble, util.Random.nextInt),
+      Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
+      imgFollower)
+      * 
+      */
+  
+  //followers += follower
   
   val listenerTarget = new ActionListener(){
       def actionPerformed(e : java.awt.event.ActionEvent) = {
@@ -32,16 +54,16 @@ class World(val height: Int, val width: Int) {
   
   // Avaruuden piirtäminen on asteroidien piirtämistä
   def draw(g: Graphics2D) {
-    //ships foreach (_.draw(g))
+    followers foreach (_.draw(g))
     leader.draw(g)
   }
   
   def step() = {
-    //ships.foreach(_.move())
+    followers.foreach(_.move())
     leader.move()
   }
   
   def targetUpdate() = {
-    target = Vector2D(util.Random.nextInt(600) + 100, util.Random.nextInt(600) + 100)
+    target = Vector2D(util.Random.nextInt(height * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100)
   }
 }

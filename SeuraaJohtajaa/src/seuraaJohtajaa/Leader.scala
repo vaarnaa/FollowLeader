@@ -13,9 +13,22 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
   val minDistance = 50
   var wanderingRadius: Double = 0
   var wanderAngle: Double = 0
+  var followerTarget = Vector2D(world.width / 2, world.height / 2)
   
   
   override def draw(g: Graphics2D) = {
+    //update leaderBehind
+    if (velocity.sizeOf() > 0) {
+      val leaderVel = world.leader.velocity
+      val leaderVelSize = leaderVel.sizeOf()
+      val leaderVelUnit = leaderVel / leaderVelSize
+      followerTarget = world.leader.place - leaderVelUnit * 30   
+    }
+    
+    
+    
+    
+    
     val angle = {
       if (velocity.x == 0 && velocity.y == 0) 0
       else if (velocity.x == 0 && velocity.y > 0) Math.PI / 2
@@ -24,9 +37,8 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
       else if (velocity.x < 0 && velocity.y > 0)  Math.atan(velocity.y / velocity.x) + Math.PI
       else Math.atan(velocity.y / velocity.x)
     }
-    println()
+    
     val oldTransform = g.getTransform()
-    //val newTransform = oldTransform.clone().asInstanceOf[AffineTransform]
     val at = new AffineTransform() 
     
     at.setToRotation(angle, place.x, place.y);
@@ -40,8 +52,8 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
     val direction = world.target - place
     
     //muutetaan kohteen sijaintia jos ollaan lähellä
-    if (direction.sizeOf() < 20) {
-      world.target = Vector2D(util.Random.nextInt(600) + 100, util.Random.nextInt(600) + 100)
+    if (direction.sizeOf() < 30) {
+      world.targetUpdate()
       world.timerTarget.restart() 
     }
     
@@ -166,19 +178,19 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
     //lasketaan seinien repulsiot eri suunnille ja seinille
     var velX = 0.0
     var velY = 0.0
-    if (place.x < world.width / 10) {
+    if (place.x < world.width / 8) {
       velX =  2 * maxVelocity / ( 1 + place.x)
     }
     
-    if (place.x > world.width * 9 / 10) {
+    if (place.x > world.width * 7 / 8) {
       velX =  -(2 * maxVelocity / ( 1 + world.width - place.x))
     }
     
-    if (place.y < world.height / 10) {
+    if (place.y < world.height / 8) {
       velY =  2 * maxVelocity / ( 1 + place.y)
     }
     
-    if (place.y > world.height * 9 / 10) {
+    if (place.y > world.height * 7 / 8) {
       velY = -(2 * maxVelocity / ( 1 + world.height - place.y))
     }
     

@@ -37,6 +37,7 @@ object Game extends SimpleSwingApplication {
         // Piirretään pelimaailma
         g.setColor(Color.red);
         val targetCircle = new Ellipse2D.Double(gameWorld.target.x - 8, gameWorld.target.y - 8, 2.0 * 8, 2.0 * 8)
+        g.fill(targetCircle);
         g.draw(targetCircle);
         gameWorld.draw(g)
         

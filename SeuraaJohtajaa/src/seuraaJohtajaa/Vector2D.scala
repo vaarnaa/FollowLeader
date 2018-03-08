@@ -17,6 +17,10 @@ case class Vector2D(x: Double, y: Double) {
     return Vector2D(x * k, y * k) 
   }
   
+  def / (k: Double): Vector2D = {
+    return Vector2D(x / k, y / k) 
+  }
+  
   def sizeOf() = {
     Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2))
   }
