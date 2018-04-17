@@ -17,16 +17,13 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
   
   
   override def draw(g: Graphics2D) = {
-    //update leaderBehind
+    //update followerTarget
     if (velocity.sizeOf() > 0) {
       val leaderVel = world.leader.velocity
       val leaderVelSize = leaderVel.sizeOf()
       val leaderVelUnit = leaderVel / leaderVelSize
       followerTarget = world.leader.place - leaderVelUnit * 30   
     }
-    
-    
-    
     
     
     val angle = {
@@ -47,6 +44,7 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
     g.setTransform(oldTransform);
   }
   
+  
   override def move() {
     //tutkitaan etäisyys kohteeseen
     val direction = world.target - place
@@ -63,6 +61,7 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
     //lasketaan uusi paikka
     place = place + Vector2D(velocity.x, velocity.y)
   }
+  
   
   def calculateVelocity() = {
     
@@ -82,8 +81,6 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
       combinedVel *=  k
     }
     
-    
-    
     val wallRep = wallRepulsion(combinedVel)
     
     var totalVel = combinedVel + wallRep
@@ -97,6 +94,7 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
     totalVel
     
   }
+  
   
   def seekingVelocity() = {
     
@@ -126,6 +124,7 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
     newVel
     
   }
+  
   
   def wanderingVelocity(seekVel: Vector2D) = {
     

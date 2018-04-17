@@ -48,6 +48,10 @@ object Game extends SimpleSwingApplication {
     
     contents = arena
     
+    /*while(true) {
+      
+    }*/
+    
     val listener = new ActionListener(){
       def actionPerformed(e : java.awt.event.ActionEvent) = {
         gameWorld.step()

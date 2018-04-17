@@ -12,6 +12,7 @@ class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Ve
   val minDistance = 50
   var wanderingRadius: Double = 0
   var wanderAngle: Double = 0
+  val separationDistance = 50
   
   
   override def draw(g: Graphics2D) = {
@@ -67,16 +68,22 @@ class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Ve
       combinedVel *=  k
     }
     
+    val wallRep = wallRepulsion(combinedVel)
     
+    combinedVel += wallRep
     
-    //val wallRep = wallRepulsion(combinedVel)
+    //nopeus ei saa ylittää maksimiarvoa
+    if (combinedVel.sizeOf() > maxVel) {
+      val k = maxVel / combinedVel.sizeOf()
+      combinedVel = combinedVel * k
+    }
     
-    var totalVel = combinedVel //+ wallRep
+    var totalVel = combinedVel + separationVelocity()
     
     //nopeus ei saa ylittää maksimiarvoa
     if (totalVel.sizeOf() > maxVel) {
       val k = maxVel / totalVel.sizeOf()
-      totalVel = totalVel * k
+      totalVel *= k
     }
     
     totalVel
@@ -111,6 +118,74 @@ class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Ve
     }
     
     newVel
+    
+  }
+  
+  
+  def wallRepulsion(combVel: Vector2D) = {
+    
+    //lasketaan seinien repulsiot eri suunnille ja seinille
+    var velX = 0.0
+    var velY = 0.0
+    if (place.x < world.width / 8) {
+      velX =  2 * maxVelocity / ( 1 + place.x)
+    }
+    
+    if (place.x > world.width * 7 / 8) {
+      velX =  -(2 * maxVelocity / ( 1 + world.width - place.x))
+    }
+    
+    if (place.y < world.height / 8) {
+      velY =  2 * maxVelocity / ( 1 + place.y)
+    }
+    
+    if (place.y > world.height * 7 / 8) {
+      velY = -(2 * maxVelocity / ( 1 + world.height - place.y))
+    }
+    
+    val velRep = Vector2D(velX, velY)
+    
+    velRep
+     
+  }
+  
+  
+  def separationVelocity() = {
+    var sepVel = Vector2D(0,0)
+    
+    for (follower <- world.followers) {
+      
+      if (follower equals this) {
+      }
+      
+      //jos seuraaja on jokin toinen
+      else {
+        //lasketaan etäisyys seuraajien välillä
+        val distanceVector = this.place - follower.place 
+        val distance = distanceVector.sizeOf()
+        
+        //jos seuraajat ovat tarpeeksi lähellä, hylkivät ne toisiaan
+        if (distance < separationDistance) {
+          //jokaisen seuraajan hylkimisnopeus lasketaan yhteen
+          val sepVelFollower =  distanceVector * maxVelocity / ( 1 + distance)
+          sepVel += sepVelFollower
+        }
+      }
+    }
+    
+    //lasketaan vielä hylkimisnopeus johtajasta
+    val distanceVector = this.place - world.leader.place 
+    val distance = distanceVector.sizeOf()
+    
+    //jos johtaja ovat tarpeeksi lähellä, hylkii se seuraajaa
+    if (distance < separationDistance) {
+      //jokaisen seuraajan hylkimisnopeus lasketaan yhteen
+      val sepVelLeader =  distanceVector * maxVelocity / ( 1 + distance)
+      sepVel += sepVelLeader
+    }
+    
+    sepVel
+    
     
   }
   

@@ -19,7 +19,7 @@ class World(val height: Int, val width: Int) {
   val leader = new Leader(this, 70, Vector2D(0,0), Vector2D(300,300), imgLeader)
   
   //lisätään kolme followeria satunnaisilla aloituspaikoilla ja -nopeuksilla
-  for( x <- 0 until 3 ){
+  for( x <- 0 until 20 ){
    val x = util.Random.nextDouble
    val y = util.Random.nextDouble
    followers += new Follower(
