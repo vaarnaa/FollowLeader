@@ -18,8 +18,8 @@ class World(val height: Int, val width: Int) {
   
   val leader = new Leader(this, 70, Vector2D(0,0), Vector2D(300,300), imgLeader)
   
-  //lisätään kolme followeria satunnaisilla aloituspaikoilla ja -nopeuksilla
-  for( x <- 0 until 20 ){
+  //lisätään followereita satunnaisilla aloituspaikoilla ja -nopeuksilla
+  for( x <- 0 until 1 ){
    val x = util.Random.nextDouble
    val y = util.Random.nextDouble
    followers += new Follower(
@@ -51,9 +51,35 @@ class World(val height: Int, val width: Int) {
    timerTarget.start()
   
   //ships += leader
+   
+  def addFollower() = {
+     if (followers.size < 20) {
+       val x = util.Random.nextDouble
+       val y = util.Random.nextDouble
+       followers += new Follower(
+        this,
+        70,
+        Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
+        Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
+        imgFollower)
+       true
+     }
+     
+     else
+       false
+   }
+   
+   def removeFollower() = {
+     if (followers.size > 0) {
+       followers.remove(followers.size - 1)
+       true
+     }
+     else
+       false
+   }
   
   // Avaruuden piirtäminen on asteroidien piirtämistä
-  def draw(g: Graphics2D) {
+  def draw(g: Graphics2D) = {
     followers foreach (_.draw(g))
     leader.draw(g)
   }

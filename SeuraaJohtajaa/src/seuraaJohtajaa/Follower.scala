@@ -12,7 +12,7 @@ class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Ve
   val minDistance = 50
   var wanderingRadius: Double = 0
   var wanderAngle: Double = 0
-  val separationDistance = 50
+  val separationDistance = 100
   
   
   override def draw(g: Graphics2D) = {
@@ -77,6 +77,16 @@ class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Ve
       val k = maxVel / combinedVel.sizeOf()
       combinedVel = combinedVel * k
     }
+    
+    /*val velAvoidance = avoidanceVelocity()
+    println(velAvoidance)
+    combinedVel += velAvoidance*/
+    
+    //nopeus ei saa ylittää maksimiarvoa
+    /*if (combinedVel.sizeOf() > maxVel) {
+      val k = maxVel / combinedVel.sizeOf()
+      combinedVel = combinedVel * k
+    }*/
     
     var totalVel = combinedVel + separationVelocity()
     
@@ -149,6 +159,41 @@ class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Ve
      
   }
   
+  def avoidanceVelocity() = {
+    
+    var avoidanceVector = Vector2D(0,0)
+    var avoidanceVelocity = Vector2D(0,0)
+    
+    if (world.leader.velocity.y != 0 && world.leader.velocity.x != 0) {
+      
+      //lasketaan johtajan nopeusvektorin määräämä suoran- ja normaalin kulmakerroin
+      val k = world.leader.velocity.y / world.leader.velocity.x
+      val kNormal = -1/k
+      
+      //lasketaan seuraajan paikan ja nopeuden määräämän suoran leikkauspiste johtajan suoran kanssa
+      val x = (1/k * this.place.x + this.place.y + k * world.leader.place.x - world.leader.place.y) / (k + 1/k)
+      val y = k * x - k * world.leader.place.x + world.leader.place.y
+      
+      //lasketaan vektori pisteestä seuraajan paikkaan
+      avoidanceVector = this.place - Vector2D(x, y)
+      
+    }
+    
+    //lasketaan välttelyvektorin pituus ja määrätään välttelynopeus
+    val disAvoidanceVector = avoidanceVector.sizeOf()
+    if (disAvoidanceVector < 10) {
+      avoidanceVelocity =  avoidanceVector / disAvoidanceVector * maxVelocity / ( 1 + disAvoidanceVector)
+    }
+    
+    avoidanceVelocity
+    
+    
+    
+    
+     
+    
+  }
+  
   
   def separationVelocity() = {
     var sepVel = Vector2D(0,0)
@@ -167,7 +212,7 @@ class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Ve
         //jos seuraajat ovat tarpeeksi lähellä, hylkivät ne toisiaan
         if (distance < separationDistance) {
           //jokaisen seuraajan hylkimisnopeus lasketaan yhteen
-          val sepVelFollower =  distanceVector * maxVelocity / ( 1 + distance)
+          val sepVelFollower =  distanceVector / distanceVector.sizeOf() * 2 * maxVelocity / ( 1 + distance)
           sepVel += sepVelFollower
         }
       }
@@ -179,8 +224,8 @@ class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Ve
     
     //jos johtaja ovat tarpeeksi lähellä, hylkii se seuraajaa
     if (distance < separationDistance) {
-      //jokaisen seuraajan hylkimisnopeus lasketaan yhteen
-      val sepVelLeader =  distanceVector * maxVelocity / ( 1 + distance)
+      //lasketaan hylkimisnopeus ja ynnätään se jo summattuihin
+      val sepVelLeader =  distanceVector / distanceVector.sizeOf() * 4 * maxVelocity / ( 1 + distance)
       sepVel += sepVelLeader
     }
     
