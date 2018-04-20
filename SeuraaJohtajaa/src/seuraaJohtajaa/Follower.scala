@@ -4,7 +4,7 @@ import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.awt.geom.AffineTransform
 
-class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Vector2D, img: BufferedImage) extends Ship() {
+class Follower(world: World, mass: Double, _velocity: Vector2D, _place: Vector2D, _img: BufferedImage) extends Ship(_velocity, _place, _img) {
     
   val maxVelocity = 2.0
   //val maxVelChange = 0.04
@@ -15,27 +15,8 @@ class Follower(world: World, mass: Double, var velocity: Vector2D, var place: Ve
   val separationDistance = 100
   
   
-  override def draw(g: Graphics2D) = {
-    val angle = {
-      if (velocity.x == 0 && velocity.y == 0) 0
-      else if (velocity.x == 0 && velocity.y > 0) Math.PI / 2
-      else if (velocity.x == 0 && velocity.y < 0) -Math.PI / 2
-      else if (velocity.x < 0 && velocity.y < 0)  Math.atan(velocity.y / velocity.x) + Math.PI
-      else if (velocity.x < 0 && velocity.y > 0)  Math.atan(velocity.y / velocity.x) + Math.PI
-      else Math.atan(velocity.y / velocity.x)
-    }
-    
-    val oldTransform = g.getTransform()
-    val at = new AffineTransform() 
-    
-    at.setToRotation(angle, place.x, place.y);
-    g.setTransform(at)
-    g.drawImage(this.img, null, place.x.toInt, (place.y.toInt))
-    g.setTransform(oldTransform);
-  }
   
-  
-  override def move() {
+  def move() {
     //tutkitaan etäisyys kohteeseen
     val direction = world.leader.followerTarget - place
     

@@ -5,7 +5,7 @@ import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.awt.geom.AffineTransform
 
-class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vector2D, img: BufferedImage) extends Ship() {
+class Leader(world: World, mass: Double, _velocity: Vector2D, _place: Vector2D, _img: BufferedImage) extends Ship(_velocity, _place, _img) {
   
   val maxVelocity = 2.0
   //val maxVelChange = 0.04
@@ -16,7 +16,8 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
   var followerTarget = Vector2D(world.width / 2, world.height / 2)
   
   
-  override def draw(g: Graphics2D) = {
+  def move() {
+    
     //update followerTarget
     if (velocity.sizeOf() > 0) {
       val leaderVel = world.leader.velocity
@@ -25,27 +26,6 @@ class Leader(world: World, mass: Double, var velocity: Vector2D, var place: Vect
       followerTarget = world.leader.place - leaderVelUnit * 30   
     }
     
-    
-    val angle = {
-      if (velocity.x == 0 && velocity.y == 0) 0
-      else if (velocity.x == 0 && velocity.y > 0) Math.PI / 2
-      else if (velocity.x == 0 && velocity.y < 0) -Math.PI / 2
-      else if (velocity.x < 0 && velocity.y < 0)  Math.atan(velocity.y / velocity.x) + Math.PI
-      else if (velocity.x < 0 && velocity.y > 0)  Math.atan(velocity.y / velocity.x) + Math.PI
-      else Math.atan(velocity.y / velocity.x)
-    }
-    
-    val oldTransform = g.getTransform()
-    val at = new AffineTransform() 
-    
-    at.setToRotation(angle, place.x, place.y);
-    g.setTransform(at)
-    g.drawImage(this.img, null, place.x.toInt, (place.y.toInt))
-    g.setTransform(oldTransform);
-  }
-  
-  
-  override def move() {
     //tutkitaan etäisyys kohteeseen
     val direction = world.target - place
     

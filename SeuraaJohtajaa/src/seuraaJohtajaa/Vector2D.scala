@@ -13,14 +13,17 @@ case class Vector2D(x: Double, y: Double) {
     Vector2D(x - other.x, y - other.y)    
   }
   
+  //kerrotaan vektori vakiolla
   def * (k: Double): Vector2D = {
     return Vector2D(x * k, y * k) 
   }
   
+  //jaetaan vektori vakiolla
   def / (k: Double): Vector2D = {
     return Vector2D(x / k, y / k) 
   }
   
+  //lasketaan vektorin pituus
   def sizeOf() = {
     Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2))
   }

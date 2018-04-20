@@ -9,26 +9,31 @@ import java.awt.geom.Ellipse2D
 
 object Game extends SimpleSwingApplication {
   
-  val width      = 800
-  val height     = 800
+  val mainFrameWidth      = 800
+  val mainFrameHeight     = 800
+  var gameWidth = 0
+  var gameHeight = 0
   
-  val gameWorld = new World(height, width)
+  val gameWorld = new World(mainFrameHeight, mainFrameWidth)
   
   /*
-  GameState = 1, means game is running
-  GameState = 0, means game is stopped
+  GameState = 0, means game is not-started
+  GameState = 1, means game is started and running
+  GameState = 2, means game is started but stopped
    */
   var gameState = 1
   
-  def top = new MainFrame {
+  def top = new Canvas()
+    
+  class Canvas extends MainFrame {
     
     title     = "Seuraa johtajaa"
-    resizable = false
-    //resizable = true
+    //resizable = false
+    resizable = true
     
-    minimumSize   = new Dimension(width,height)
-    preferredSize = new Dimension(width,height)
-    maximumSize   = new Dimension(width,height)
+    minimumSize   = new Dimension(mainFrameWidth,mainFrameHeight)
+    //preferredSize = new Dimension(mainFrameWidth,mainFrameHeight)
+    //maximumSize   = new Dimension(mainFrameWidth,mainFrameHeight)
     
     val buttonPause = new Button("Pause")
     val buttonAddFollower = new Button("Add follower")
@@ -41,13 +46,21 @@ object Game extends SimpleSwingApplication {
       contents += buttonRemoveFollower
     }
     
+    
+    
+    
     val arena = new Panel {
       
       override def paintComponent(g: Graphics2D) = {
+        
+        if (gameState == 0) {
+          g.setColor(new Color(255, 255, 255))
+          g.fillRect(0, 0, mainFrameWidth, mainFrameHeight)
+        }
 
         // Piirretään valkoisella vanhan kuvan päälle suorakaide
         g.setColor(new Color(255, 255, 255))
-        g.fillRect(0, 0, width, height)
+        g.fillRect(0, 0, mainFrameWidth, mainFrameHeight)
 
         // Pyydetään graphics:ilta siloiteltua grafiikkaa ns. antialiasointia
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)          
@@ -62,10 +75,21 @@ object Game extends SimpleSwingApplication {
         
       }
    
+      
     }
     
-    val textField = new TextField()
-    textField.editable = false
+    
+    val textField = new TextArea() {
+      editable = false
+      
+    }
+    
+    //textField.
+    //text
+    
+    /*val centerPanel = new BorderPanel { 
+     contents += arena.center
+    }*/
     
     
     //contents += arena
@@ -93,7 +117,7 @@ object Game extends SimpleSwingApplication {
       case ButtonClicked(`buttonPause`) => pause()
       case ButtonClicked(`buttonAddFollower`) => if (gameWorld.addFollower()) textField.text = "Follower added"
       case ButtonClicked(`buttonRemoveFollower`) => if (gameWorld.removeFollower()) textField.text = "Follower removed"
-      case MouseClicked(_, p, _, _, _) => pause()
+      //case MouseClicked(_, p, _, _, _) => pause()
       case KeyPressed(_, Key.Enter, _, _) => pause()
         /*if (key == 'p') {
           println("moro")
@@ -107,17 +131,17 @@ object Game extends SimpleSwingApplication {
     private def pause(): Unit = {
       if (gameState == 1) {
     	  gameTimer.stop()
-    	  gameState = 0
+    	  gameState = 2
     	  textField.text = "Game paused"
       }
-      else {
+      else if (gameState == 2){
         gameTimer.restart()
         gameState = 1
         textField.text = "Game restarted"
       }
     }
     
-    def newGame() = {
+    def newGame(size: Int) = {
       
     }
     
@@ -131,12 +155,7 @@ object Game extends SimpleSwingApplication {
     val gameTimer = new javax.swing.Timer(6, listener)
     gameTimer.start()
     
-    
-    
-    
-    
-    
-    
+
   }
   
 }

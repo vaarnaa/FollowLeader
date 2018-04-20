@@ -16,13 +16,23 @@ class World(val height: Int, val width: Int) {
   
   var target = Vector2D(300, 500)
   
-  val leader = new Leader(this, 70, Vector2D(0,0), Vector2D(300,300), imgLeader)
+   val x = util.Random.nextDouble
+   val y = util.Random.nextDouble
+   val leader = new Leader(
+      this,
+      70,
+      Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
+      Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
+      imgLeader) 
+ 
+  
+  //val leader = new Leader(this, 70, Vector2D(0,0), Vector2D(300,300), imgLeader)
   
   //lisätään followereita satunnaisilla aloituspaikoilla ja -nopeuksilla
   for( x <- 0 until 1 ){
-   val x = util.Random.nextDouble
-   val y = util.Random.nextDouble
-   followers += new Follower(
+    val x = util.Random.nextDouble
+    val y = util.Random.nextDouble
+    followers += new Follower(
       this,
       70,
       Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
@@ -53,7 +63,7 @@ class World(val height: Int, val width: Int) {
   //ships += leader
    
   def addFollower() = {
-     if (followers.size < 20) {
+     if (followers.size < 20) followers.synchronized {
        val x = util.Random.nextDouble
        val y = util.Random.nextDouble
        followers += new Follower(
@@ -69,7 +79,7 @@ class World(val height: Int, val width: Int) {
        false
    }
    
-   def removeFollower() = {
+   def removeFollower() = followers.synchronized {
      if (followers.size > 0) {
        followers.remove(followers.size - 1)
        true
@@ -79,12 +89,12 @@ class World(val height: Int, val width: Int) {
    }
   
   // Avaruuden piirtäminen on asteroidien piirtämistä
-  def draw(g: Graphics2D) = {
+  def draw(g: Graphics2D) = followers.synchronized {
     followers foreach (_.draw(g))
     leader.draw(g)
   }
   
-  def step() = {
+  def step() = followers.synchronized {
     followers.foreach(_.move())
     leader.move()
   }
