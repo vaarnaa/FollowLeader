@@ -14,46 +14,14 @@ class World(val height: Int, val width: Int) {
   val imgLeader = ImageIO.read(new File("alus_musta.png"))
   val imgFollower = ImageIO.read(new File("alus2.png"))
   
-  var target = Vector2D(300, 500)
-  
-   val x = util.Random.nextDouble
-   val y = util.Random.nextDouble
-   val leader = new Leader(
-      this,
-      70,
-      Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
-      Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
-      imgLeader) 
- 
-  
-  //val leader = new Leader(this, 70, Vector2D(0,0), Vector2D(300,300), imgLeader)
-  
-  //lisätään followereita satunnaisilla aloituspaikoilla ja -nopeuksilla
-  for( x <- 0 until 1 ){
-    val x = util.Random.nextDouble
-    val y = util.Random.nextDouble
-    followers += new Follower(
-      this,
-      70,
-      Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
-      Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
-      imgFollower)
-}
-  
-  /*val follower = new Follower(
-      this,
-      70,
-      Vector2D(util.Random.nextDouble, util.Random.nextInt),
-      Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
-      imgFollower)
-      * 
-      */
-  
-  //followers += follower
+  var target: Vector2D = null
+  var leader: Leader = null
   
   val listenerTarget = new ActionListener(){
       def actionPerformed(e : java.awt.event.ActionEvent) = {
-        targetUpdate()
+        if (leader != null) {
+          targetUpdate()
+        }
       }  
     }
     
@@ -62,8 +30,29 @@ class World(val height: Int, val width: Int) {
   
   //ships += leader
    
+   
+  //
+  def createInitialShips() = {
+     createLeader()
+     followers.clear
+     addFollower()
+   }
+   
+   
+  def createLeader() = {
+     val x = util.Random.nextDouble
+     val y = util.Random.nextDouble
+     leader = new Leader(
+      this,
+      70,
+      Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
+      Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
+      imgLeader) 
+   }
+   
+   
   def addFollower() = {
-     if (followers.size < 20) followers.synchronized {
+     if (followers.size < 20 && leader != null) followers.synchronized {
        val x = util.Random.nextDouble
        val y = util.Random.nextDouble
        followers += new Follower(
@@ -90,14 +79,41 @@ class World(val height: Int, val width: Int) {
   
   // Avaruuden piirtäminen on asteroidien piirtämistä
   def draw(g: Graphics2D) = followers.synchronized {
-    followers foreach (_.draw(g))
-    leader.draw(g)
+    if (leader != null && target != null) {
+      g.setColor(Color.red);
+      val targetCircle = new Ellipse2D.Double(this.target.x - 8, this.target.y - 8, 2.0 * 8, 2.0 * 8)
+      g.fill(targetCircle);
+      g.draw(targetCircle);
+      leader.draw(g)
+      if (followers.size > 0) {
+        followers foreach (_.draw(g))
+      }
+      
+    }
   }
   
   def step() = followers.synchronized {
-    followers.foreach(_.move())
-    leader.move()
+    
+    //jos targettia ei luotu, luodaan se
+    if (target == null) {
+      targetUpdate()
+    }
+    
+    //jos johtaja olemassa, liikutetaan sitä
+    if (leader != null) {
+      leader.move()
+      //if (followers.size > 0) {
+        followers.foreach(_.move())
+    //}
+    }
+    
   }
+  
+  def manualTarget(x: Int, y: Int) = {
+    target = Vector2D(x, y)
+    timerTarget.restart()
+  }
+  
   
   def targetUpdate() = {
     target = Vector2D(util.Random.nextInt(height * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100)
