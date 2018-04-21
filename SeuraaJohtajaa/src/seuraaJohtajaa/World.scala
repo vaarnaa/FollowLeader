@@ -7,9 +7,12 @@ import javax.imageio.ImageIO
 import java.awt.geom.Ellipse2D
 import java.awt.event.ActionListener
 
-class World(val height: Int, val width: Int) {
+class World(val height: Int, val width: Int, var maxVelocity: Double) {
   
   val followers = Buffer[Follower]()
+  
+  var leaderMaxVelocity = maxVelocity
+  var followerMaxVelocity = maxVelocity
   
   val imgLeader = ImageIO.read(new File("alus_musta.png"))
   val imgFollower = ImageIO.read(new File("alus2.png"))
@@ -28,10 +31,7 @@ class World(val height: Int, val width: Int) {
    val timerTarget = new javax.swing.Timer(2000, listenerTarget)
    timerTarget.start()
   
-  //ships += leader
-   
-   
-  //
+  
   def createInitialShips() = {
      createLeader()
      followers.clear
