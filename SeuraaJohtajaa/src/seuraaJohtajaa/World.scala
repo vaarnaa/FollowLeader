@@ -7,12 +7,13 @@ import javax.imageio.ImageIO
 import java.awt.geom.Ellipse2D
 import java.awt.event.ActionListener
 
-class World(val height: Int, val width: Int, var maxVelocity: Double) {
+class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: Double) {
   
   val followers = Buffer[Follower]()
   
   var leaderMaxVelocity = maxVelocity
   var followerMaxVelocity = maxVelocity
+  var maxVelChange = maxVelocity / mass
   
   val imgLeader = ImageIO.read(new File("alus_musta.png"))
   val imgFollower = ImageIO.read(new File("alus2.png"))
@@ -30,6 +31,11 @@ class World(val height: Int, val width: Int, var maxVelocity: Double) {
     
    val timerTarget = new javax.swing.Timer(2000, listenerTarget)
    timerTarget.start()
+   
+   
+   def newMaxVelChange() = {
+     maxVelChange = maxVelocity / mass
+   }
   
   
   def createInitialShips() = {
@@ -44,9 +50,8 @@ class World(val height: Int, val width: Int, var maxVelocity: Double) {
      val y = util.Random.nextDouble
      leader = new Leader(
       this,
-      70,
       Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
-      Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
+      Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(height * 7 / 10) + 100),
       imgLeader) 
    }
    
@@ -57,9 +62,8 @@ class World(val height: Int, val width: Int, var maxVelocity: Double) {
        val y = util.Random.nextDouble
        followers += new Follower(
         this,
-        70,
         Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
-        Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100),
+        Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(height * 7 / 10) + 100),
         imgFollower)
        true
      }
@@ -116,6 +120,6 @@ class World(val height: Int, val width: Int, var maxVelocity: Double) {
   
   
   def targetUpdate() = {
-    target = Vector2D(util.Random.nextInt(height * 7 / 10) + 100, util.Random.nextInt(width * 7 / 10) + 100)
+    target = Vector2D(util.Random.nextInt(width - 200) + 100, util.Random.nextInt(height - 200) + 100)
   }
 }

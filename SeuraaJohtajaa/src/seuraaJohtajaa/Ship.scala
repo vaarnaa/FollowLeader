@@ -32,7 +32,7 @@ abstract class Ship(var world: World, var velocity: Vector2D, var place: Vector2
   }
   
   
-  def wallRepulsion(combVel: Vector2D) = {
+  /*def wallRepulsion(combVel: Vector2D) = {
     
     //lasketaan seinien repulsiot eri suunnille ja seinille
     var velX = 0.0
@@ -57,7 +57,9 @@ abstract class Ship(var world: World, var velocity: Vector2D, var place: Vector2
     
     velRep
      
-  }
+  }*/
+  
+  def wallRepulsion(combVel: Vector2D): Vector2D
   
   def move: Unit
   

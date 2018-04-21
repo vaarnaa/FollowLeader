@@ -5,11 +5,11 @@ import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.awt.geom.AffineTransform
 
-class Leader(_world: World, mass: Double, _velocity: Vector2D, _place: Vector2D, _img: BufferedImage) extends Ship(_world, _velocity, _place, _img) {
+class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: BufferedImage) extends Ship(_world, _velocity, _place, _img) {
   
   //val world.maxVelocity = 2.0
   //val maxVelChange = 0.04
-  val maxVelChange = world.maxVelocity / mass
+  //var maxVelChange = world.leaderMaxVelocity / world.mass
   val minDistance = 50
   var wanderingRadius: Double = 0
   var wanderAngle: Double = 0
@@ -51,8 +51,8 @@ class Leader(_world: World, mass: Double, _velocity: Vector2D, _place: Vector2D,
     
     val direction = world.target - place
     val maxVel = { //maksiminopeus riippuu etäisyydestä kohteeseen
-      if (direction.sizeOf() < 200) Math.min(Math.max(direction.sizeOf() / 100 * world.maxVelocity, 0.005), world.maxVelocity)
-      else world.maxVelocity
+      if (direction.sizeOf() < 200) Math.min(Math.max(direction.sizeOf() / 100 * world.leaderMaxVelocity, 0.005), world.leaderMaxVelocity)
+      else world.leaderMaxVelocity
     }
     
     //nopeus ei saa ylittää maksimiarvoa
@@ -83,16 +83,16 @@ class Leader(_world: World, mass: Double, _velocity: Vector2D, _place: Vector2D,
     
     //lasketaan tarvittava muutosnopeusvektori
     var steerDir = direction + velocity
-    if (steerDir.sizeOf() > maxVelChange) { //nopeuden muutos ei saa ylittää maksimiarvoa
-      val k = maxVelChange / steerDir.sizeOf()
+    if (steerDir.sizeOf() > world.maxVelChange) { //nopeuden muutos ei saa ylittää maksimiarvoa
+      val k = world.maxVelChange / steerDir.sizeOf()
       steerDir = steerDir * k
     }
     
     //lasketaan uusi nopeusvektori
     var newVel = velocity + steerDir
     val maxVel = { //maksiminopeus riippuu etäisyydestä kohteeseen
-      if (direction.sizeOf() < 200) Math.min(direction.sizeOf() / 50 * world.maxVelocity, world.maxVelocity)
-      else world.maxVelocity
+      if (direction.sizeOf() < 200) Math.min(direction.sizeOf() / 50 * world.leaderMaxVelocity, world.leaderMaxVelocity)
+      else world.leaderMaxVelocity
     }
     
     //nopeus ei saa ylittää maksimiarvoa
@@ -152,31 +152,31 @@ class Leader(_world: World, mass: Double, _velocity: Vector2D, _place: Vector2D,
   }
   
   
-  /*def wallRepulsion(combVel: Vector2D) = {
+  def wallRepulsion(combVel: Vector2D) = {
     
     //lasketaan seinien repulsiot eri suunnille ja seinille
     var velX = 0.0
     var velY = 0.0
-    if (place.x < world.width / 8) {
-      velX =  2 * world.maxVelocity / ( 1 + place.x)
+    if (place.x < 100) {
+      velX =  2 * world.leaderMaxVelocity / ( 1 + {if(place.x - 20 < 0)place.x else place.x - 20})
     }
     
-    if (place.x > world.width * 7 / 8) {
-      velX =  -(2 * world.maxVelocity / ( 1 + world.width - place.x))
+    if (place.x > world.width - 100) {
+      velX =  -(2 * world.leaderMaxVelocity / ( 1 + {if(world.width - place.x - 20 < 0)world.width - place.x else world.width - place.x - 20}))
     }
     
-    if (place.y < world.height / 8) {
-      velY =  2 * world.maxVelocity / ( 1 + place.y)
+    if (place.y < 100) {
+      velY =  2 * world.leaderMaxVelocity / ( 1 + {if(place.y - 10 < 0)place.y else place.y - 10})
     }
     
-    if (place.y > world.height * 7 / 8) {
-      velY = -(2 * world.maxVelocity / ( 1 + world.height - place.y))
+    if (place.y > world.height - 100) {
+      velY = -(2 * world.leaderMaxVelocity / ( 1 + {if(world.height - place.y - 20 < 0)world.height - place.y else world.height - place.y - 20}))
     }
     
     val velRep = Vector2D(velX, velY)
     
     velRep
      
-  }*/
+  }
   
 }

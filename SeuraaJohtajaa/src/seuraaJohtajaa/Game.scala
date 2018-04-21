@@ -21,9 +21,9 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
     
     var gameArea = new Arena(width, height)
     var count = 0
-    var countNumber = 4
+    var countNumber = 3
     var maxVelocity = 2.0
-    var mass = 70
+    var mass = 60.0
     
     
     //minimumSize   = new Dimension(width, height)
@@ -38,14 +38,13 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
       background = Color.white
       border = EmptyBorder(5, 5, 5, 5)
       contents += buttonPause
-      //contents += buttonChangeMaxSpeed
       contents += buttonAddFollower
       contents += buttonRemoveFollower
     }
     
-    val changeMaxSpeedText = new TextArea(1,1) {
+    val changeShipMaxSpeedText = new TextArea(1,1) {
        border = EmptyBorder(10, 10, 10, 0)
-       text = "Max speed: " + maxVelocity.toString
+       text = "Ship max speed: " + maxVelocity.toString
        font = new Font("Arial", 0, 18)
        editable = false
       }
@@ -57,38 +56,82 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
        editable = false
       }
     
-    val changeMassdText = new TextArea(1,1) {
+    val changeFollowerMaxSpeedText = new TextArea(1,1) {
        border = EmptyBorder(10, 10, 10, 0)
-       text = "Mass: " + countNumber.toString
+       text = "Follower max speed: " + maxVelocity.toString
        font = new Font("Arial", 0, 18)
        editable = false
       }
     
-    val buttonChangeMaxSpeed = new Button("Ship max speed") { font = new Font("Arial", 0, 16)} 
-    val buttonChangeTimerCounter = new Button("Display speed") { font = new Font("Arial", 0, 16)}
+    val changeLeaderMaxSpeedText = new TextArea(1,1) {
+       border = EmptyBorder(10, 10, 10, 0)
+       text = "Leader max speed: " + maxVelocity.toString
+       font = new Font("Arial", 0, 18)
+       editable = false
+      }
     
-    val changeFields = new BoxPanel(Orientation.Vertical) {
-      //border = LineBorder(5, 5, 5, 5)
-      border = LineBorder(Color.black)
-      background = Color.white
+    val changeShipMassText = new TextArea(1,1) {
+       border = EmptyBorder(10, 10, 10, 0)
+       text = "Mass: " + mass.toString
+       font = new Font("Arial", 0, 18)
+       editable = false
+      }
+    
+    val buttonChangeShipMaxSpeed = new Button("Ship max speed") { font = new Font("Arial", 0, 16)}
+    val buttonChangeFollowerMaxSpeed = new Button("Follower max speed") { font = new Font("Arial", 0, 16)} 
+    val buttonChangeLeaderMaxSpeed = new Button("Leader max speed") { font = new Font("Arial", 0, 16)} 
+    val buttonChangeTimerCounter = new Button("Display speed") { font = new Font("Arial", 0, 16)}
+    val buttonChangeShipMass = new Button("Ship mass") { font = new Font("Arial", 0, 16)}
+    
+    val changeTextFields = new FlowPanel() {
+      contents += changeShipMaxSpeedText
       contents += VStrut(10)
-      contents += new Label("Change parameters") {
-        font = new Font("Arial", 0, 18)
-        border = EmptyBorder(0,0,0,50)
-        }
-      contents += VStrut(20)
-      contents += buttonChangeMaxSpeed
+      contents += changeLeaderMaxSpeedText
       contents += VStrut(10)
-      contents += buttonChangeTimerCounter
-      contents += VStrut(200)
-      contents += changeMaxSpeedText
+      contents += changeFollowerMaxSpeedText
+      contents += VStrut(10)
+      contents += changeShipMassText
       contents += VStrut(10)
       contents += changeDisplaySpeedText
     }
     
+    val changeFields = new BoxPanel(Orientation.Vertical) {
+      //border = LineBorder(5, 5, 5, 5)
+      border = LineBorder(Color.black)
+      border = EmptyBorder(20)
+      background = Color.white
+      contents += VStrut(10)
+      contents += new Label("Change parameters") {
+        font = new Font("Arial", 0, 18)
+        //border = EmptyBorder(0,0,0,100)
+        border = EmptyBorder(20)
+        }
+      contents += VStrut(15)
+      contents += buttonChangeShipMaxSpeed
+      contents += VStrut(10)
+      contents += buttonChangeLeaderMaxSpeed
+      contents += VStrut(10)
+      contents += buttonChangeFollowerMaxSpeed
+      contents += VStrut(10)
+      contents += buttonChangeShipMass
+      contents += VStrut(10)
+      contents += buttonChangeTimerCounter
+      contents += VStrut(10)
+      //contents += changeTextFields
+      /*contents += changeShipMaxSpeedText
+      contents += VStrut(10)
+      contents += changeLeaderMaxSpeedText
+      contents += VStrut(10)
+      contents += changeFollowerMaxSpeedText
+      contents += VStrut(10)
+      contents += changeShipMassText
+      contents += VStrut(10)
+      contents += changeDisplaySpeedText*/
+    }
+    
      
     
-    class Arena(val width: Int, height: Int) extends Panel {
+    class Arena(width: Int, height: Int) extends Panel {
       
       preferredSize = new Dimension(width, height)
       
@@ -124,27 +167,15 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
       
     }
     
-    //textField.
-    //text
-    
-    /*val centerPanel = new BorderPanel { 
-     contents += arena.center
-    }*/
-    
-    /*val userInputs = new BorderPanel {
-      layout(buttons) = BorderPanel.Position.North
-      layout(changeFields) = BorderPanel.Position.South
-    }*/
-    
     contents = new BorderPanel {
-      //layout(userInputs) = BorderPanel.Position.North
       layout(buttons) = BorderPanel.Position.North
       layout(changeFields) = BorderPanel.Position.East
       layout(gameArea) = BorderPanel.Position.West
       layout(commandText) = BorderPanel.Position.South
+      //layout(changeTextFields) = BorderPanel.Position.South
       //border = LineBorder(Color.BLACK)
     }
-    //contents = borderPanel
+    
     
     
     
@@ -159,23 +190,27 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
       contents += new Menu("New Game") {
         { font = new Font("Arial", 0, 16)}
         contents += new MenuItem(Action("500 x 500") {
-          newGame(500)
+          newGame(500, 500)
           font = new Font("Arial", 0, 16)
         })
         contents += new MenuItem(Action("600 x 600") {
-          newGame(600)
+          newGame(600, 600)
+          font = new Font("Arial", 0, 16)
+        })
+        contents += new MenuItem(Action("900 x 600") {
+          newGame(900, 600)
           font = new Font("Arial", 0, 16)
         })
         contents += new MenuItem(Action("700 x 700") {
-          newGame(700)
+          newGame(700, 700)
           font = new Font("Arial", 0, 16)
         })
         contents += new MenuItem(Action("800 x 800") {
-          newGame(800)
+          newGame(800, 800)
           font = new Font("Arial", 0, 16)
         })
-        contents += new MenuItem(Action("900 x 900") {
-          newGame(900)
+        contents += new MenuItem(Action("1200 x 800") {
+          newGame(1200, 800)
           font = new Font("Arial", 0, 16)
         })
       }
@@ -183,7 +218,10 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
     
     //listenTo(buttonStartGame)
     listenTo(buttonPause)
-    listenTo(buttonChangeMaxSpeed)
+    listenTo(buttonChangeShipMaxSpeed)
+    listenTo(buttonChangeLeaderMaxSpeed)
+    listenTo(buttonChangeFollowerMaxSpeed)
+    listenTo(buttonChangeShipMass)
     listenTo(buttonChangeTimerCounter)
     listenTo(buttonAddFollower)
     listenTo(buttonRemoveFollower)
@@ -192,45 +230,104 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
       
     reactions += {
       case ButtonClicked(`buttonPause`) => pause()
-      case ButtonClicked(`buttonChangeMaxSpeed`) => {
-        var inputLine = showInput(contents.head, "New max speed: (0-4)", "Select new max speed", Message.Question, Swing.EmptyIcon, Nil, "")
+      case ButtonClicked(`buttonChangeShipMaxSpeed`) => {
+        var inputLine = showInput(contents.head, "New ship max speed: (0-4)", "Select new ship max speed", Message.Question, Swing.EmptyIcon, Nil, "")
         while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble > 0) || !(inputLine.get.toDouble <= 4))) {
           if (inputLine.exists(_ == None)) {
-            //println(inputLine,3)
             Unit
           }
           else {
-            inputLine = showInput(contents.head, "Please enter a double between 0 and 4.0" + "\n" + "New max speed", "Select new max speed", Message.Error, Swing.EmptyIcon, Nil, "")
-            //println(inputLine,1)
-            /*if (isDouble(inputLine)) {
-              val doubleValue = inputLine.get.toDouble  
-              if (isDouble(inputLine) && doubleValue >=0 && doubleValue <= 4) {
-                //println(inputLine,2)
-                maxVelocity = doubleValue
-                changeMaxSpeedText.text = "Maxspeed: " + maxVelocity.toString
-                gameWorld.maxVelocity = maxVelocity
-                commandText.text = "Maxspeed changed to " + maxVelocity.toString
-              } 
-            }*/
-                
+            inputLine = showInput(contents.head, "Please enter a double between 0 and 4.0" + "\n" + "New ship max speed", "Select new ship max speed", Message.Error, Swing.EmptyIcon, Nil, "")    
           }
         }
         
         if (isDouble(inputLine)) {
-          //println(inputLine,2)
-          maxVelocity = inputLine.get.toDouble
-          changeMaxSpeedText.text = "Max speed: " + maxVelocity.toString
+          maxVelocity = "%.1f".format(inputLine.get.toDouble).toDouble//inputLine.get.toDouble
+          changeShipMaxSpeedText.text = "Ship max speed: " + maxVelocity.toString
+          changeLeaderMaxSpeedText.text = "Leader max speed: " + maxVelocity.toString
+          changeFollowerMaxSpeedText.text = "Follower max speed: " + maxVelocity.toString
           gameWorld.maxVelocity = maxVelocity
-          commandText.text = "Maxspeed changed to " + maxVelocity.toString
+          gameWorld.followerMaxVelocity = maxVelocity
+          gameWorld.leaderMaxVelocity = maxVelocity
+          commandText.text = "Ship max speed changed to " + maxVelocity.toString
         }
         
       }
-      
+      case ButtonClicked(`buttonChangeLeaderMaxSpeed`) => {
+        var inputLine = showInput(contents.head, "New leader max speed: (0-4)", "Select new leader max speed", Message.Question, Swing.EmptyIcon, Nil, "")
+        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble > 0) || !(inputLine.get.toDouble <= 4))) {
+          if (inputLine.exists(_ == None)) {
+            Unit
+          }
+          else {
+            inputLine = showInput(contents.head, "Please enter a double between 0 and 4.0" + "\n" + "New leader max speed", "Select new leader max speed", Message.Error, Swing.EmptyIcon, Nil, "")    
+          }
+        }
+        
+        if (isDouble(inputLine)) {
+          val maxLeaderVelocity = "%.1f".format(inputLine.get.toDouble).toDouble//inputLine.get.toDouble
+          changeLeaderMaxSpeedText.text = "Leader max speed: " + maxLeaderVelocity.toString
+          gameWorld.leaderMaxVelocity = maxLeaderVelocity
+          
+          if (gameWorld.followerMaxVelocity < maxLeaderVelocity) {
+            gameWorld.followerMaxVelocity = maxLeaderVelocity
+            changeFollowerMaxSpeedText.text = "Follower max speed: " + maxLeaderVelocity.toString
+            commandText.text = "Ship max speed changed to " + maxLeaderVelocity.toString
+          }
+          else {
+            commandText.text = "Leader max speed changed to " + maxLeaderVelocity.toString
+          }
+        }
+      }
+      case ButtonClicked(`buttonChangeFollowerMaxSpeed`) => {
+        var inputLine = showInput(contents.head, "New follower max speed: (0-4)", "Select new follower max speed", Message.Question, Swing.EmptyIcon, Nil, "")
+        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble > 0) || !(inputLine.get.toDouble <= 4))) {
+          if (inputLine.exists(_ == None)) {
+            Unit
+          }
+          else {
+            inputLine = showInput(contents.head, "Please enter a double between 0 and 4.0" + "\n" + "New follower max speed", "Select new follower max speed", Message.Error, Swing.EmptyIcon, Nil, "")    
+          }
+        }
+        
+        if (isDouble(inputLine)) {
+          val maxFollowerVelocity = "%.1f".format(inputLine.get.toDouble).toDouble// inputLine.get.toDouble
+          changeFollowerMaxSpeedText.text = "Follower max speed: " + maxFollowerVelocity.toString
+          gameWorld.followerMaxVelocity = maxFollowerVelocity
+          
+          if (gameWorld.leaderMaxVelocity > maxFollowerVelocity) {
+            gameWorld.leaderMaxVelocity = maxFollowerVelocity
+            changeLeaderMaxSpeedText.text = "Leader max speed: " + maxFollowerVelocity.toString
+            commandText.text = "Ship max speed changed to " + maxFollowerVelocity.toString
+          }
+          else {
+            commandText.text = "Follower max speed changed to " + maxFollowerVelocity.toString
+          }
+        }
+      }
+      case ButtonClicked(`buttonChangeShipMass`) => {
+        var inputLine = showInput(contents.head, "New ship mass: (30-100)", "Select new ship mass", Message.Question, Swing.EmptyIcon, Nil, "")
+        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble >= 30) || !(inputLine.get.toDouble <= 100))) {
+          if (inputLine.exists(_ == None)) {
+            Unit
+          }
+          else {
+            inputLine = showInput(contents.head, "Please enter a double between 30 and 100" + "\n" + "New ship mass", "Select new ship mass", Message.Error, Swing.EmptyIcon, Nil, "")    
+          }
+        }
+        
+        if (isDouble(inputLine)) {
+          mass = "%.1f".format(inputLine.get.toDouble).toDouble
+          changeShipMassText.text = "Ship mass: " + mass.toString
+          gameWorld.mass = mass
+          commandText.text = "Ship mass changed to " + mass.toString
+          gameWorld.newMaxVelChange()
+        }
+      }
       case ButtonClicked(`buttonChangeTimerCounter`) => {
         var inputLine = showInput(contents.head, "New display speed: (1-4)", "Select new display update frequency", Message.Question, Swing.EmptyIcon, Nil, "")
         while (!(inputLine == None) && (!isInt(inputLine) || !(inputLine.get.toInt >= 1) || !(inputLine.get.toInt <= 4))) {
           if (inputLine.exists(_ == None)) {
-            //println(inputLine,3)
             Unit
           }
           else {
@@ -239,7 +336,6 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
         }
         
         if (isInt(inputLine)) {
-          //println(inputLine,2)
           count = 0
           countNumber = inputLine.get.toInt
           changeDisplaySpeedText.text = "Display speed: " + countNumber.toString
@@ -282,11 +378,6 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
       try {
           val dummyVariable = inputLine.get.toDouble
           true
-          /*if (dummyVariable >= 0 && dummyVariable <= 4.0)
-            true
-          else {
-            false
-          }*/
           
         } 
       catch {
@@ -302,11 +393,6 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
       try {
           val dummyVariable = inputLine.get.toInt
           true
-          /*if (dummyVariable >= 0 && dummyVariable <= 4.0)
-            true
-          else {
-            false
-          }*/
           
         } 
       catch {
@@ -333,8 +419,8 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
       }
     }
     
-    def newGame(size: Int) = {
-      val arena  = new Arena(size, size)
+    def newGame(width: Int, height: Int) = {
+      val arena  = new Arena(width, height)
       gameArea = arena
       contents = new BorderPanel {
         layout(buttons) = BorderPanel.Position.North
@@ -347,7 +433,7 @@ class Canvas(var gameState: Int, var gameWorld: World, height: Int, width: Int) 
       
       
       listenTo(gameArea.mouse.clicks)
-      gameWorld = new World(size, size, maxVelocity)
+      gameWorld = new World(height, width, maxVelocity, mass)
       gameWorld.createInitialShips()
       gameState = 1
       commandText.text = "New game started"
@@ -377,10 +463,8 @@ object Game extends SimpleSwingApplication {
   
   val width      = 600
   val height     = 600
-  var gameWidth = 0
-  var gameHeight = 0
   
-  var gameWorld = new World(height, width, 2.0)
+  var gameWorld = new World(height, width, 2.0, 60)
   
   /*
   GameState = 0, means game is not-started
