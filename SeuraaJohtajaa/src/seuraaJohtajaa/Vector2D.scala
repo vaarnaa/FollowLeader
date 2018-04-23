@@ -1,6 +1,6 @@
 package seuraaJohtajaa
 
-
+//vektoriluokka, joka kuvaa nopeuksia ja paikkoja simulaatioalueessa
 case class Vector2D(x: Double, y: Double) {
   
   //summataan kaksi vektoria keskenään

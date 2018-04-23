@@ -5,11 +5,11 @@ import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.awt.geom.AffineTransform
 
-
+//abstrakti luokka aluksille
 abstract class Ship(var world: World, var velocity: Vector2D, var place: Vector2D, img: BufferedImage) {
   
  
-  
+  //piirretään alukset simulaatioalueelle oikeaan paikkaa ja oikeassa kulmassa
   def draw(g: Graphics2D) = {
     
     val angle = {
@@ -24,40 +24,13 @@ abstract class Ship(var world: World, var velocity: Vector2D, var place: Vector2
     val oldTransform = g.getTransform()
     val at = new AffineTransform() 
     
-    at.setToRotation(angle, place.x + 15, place.y + 15);
+    at.setToRotation(angle, place.x, place.y);
     g.setTransform(at)
-    g.drawImage(this.img, null, place.x.toInt, place.y.toInt)
+    g.drawImage(this.img, null, place.x.toInt - 15, place.y.toInt - 15)
     g.setTransform(oldTransform)
     
   }
   
-  
-  /*def wallRepulsion(combVel: Vector2D) = {
-    
-    //lasketaan seinien repulsiot eri suunnille ja seinille
-    var velX = 0.0
-    var velY = 0.0
-    if (place.x < world.width / 8) {
-      velX =  2 * world.maxVelocity / ( 1 + place.x)
-    }
-    
-    if (place.x > world.width * 7 / 8) {
-      velX =  -(2 * world.maxVelocity / ( 1 + world.width - place.x))
-    }
-    
-    if (place.y < world.height / 8) {
-      velY =  2 * world.maxVelocity / ( 1 + place.y)
-    }
-    
-    if (place.y > world.height * 7 / 8) {
-      velY = -(2 * world.maxVelocity / ( 1 + world.height - place.y))
-    }
-    
-    val velRep = Vector2D(velX, velY)
-    
-    velRep
-     
-  }*/
   
   def wallRepulsion(combVel: Vector2D): Vector2D
   

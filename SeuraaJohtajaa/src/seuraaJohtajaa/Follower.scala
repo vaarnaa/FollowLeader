@@ -7,22 +7,12 @@ import java.awt.geom.AffineTransform
 class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: BufferedImage) extends Ship(_world, _velocity, _place, _img) {
     
   
-  //val maxVelChange = 0.04
-  //var maxVelChange = world.followerMaxVelocity / world.mass
-  val minDistance = 50
-  var wanderingRadius: Double = 0
-  var wanderAngle: Double = 0
-  val separationDistance = 100
+  //minimietäisyys, jolla alukset hylkivät toisiaan
+  private val separationDistance = 50
   
   
-  
+  //liikutetaan seuraaja uuteen paikkaan
   def move() {
-    //tutkitaan etäisyys kohteeseen
-    val direction = world.leader.followerTarget - place
-    
-    //muutetaan kohteen sijaintia jos ollaan lähellä
-    if (direction.sizeOf() < 20) {
-    }
     
     //lasketaan uusi nopeus
     velocity = calculateVelocity()
@@ -31,27 +21,29 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     place = place + Vector2D(velocity.x, velocity.y)
   }
   
-  
+  //lasketaan seuraajan uusi nopeus
   def calculateVelocity() = {
     
-    val seekVel = arrivalVelocity()
-    var combinedVel = seekVel
+    //nopeus jolla pyritään kohteeseen
+    var arrVel = arrivalVelocity()
     
-    val direction = world.leader.followerTarget - place
-    val maxVel = { //maksiminopeus riippuu etäisyydestä kohteeseen
+    //maksiminopeus riippuu etäisyydestä kohteeseen
+    val direction = world.getLeader().followerTarget - place
+    val maxVel = {
       if (direction.sizeOf() < 200) Math.min(Math.max(direction.sizeOf() / 100 * world.followerMaxVelocity, 0.005), world.followerMaxVelocity)
       else world.followerMaxVelocity
     }
     
     //nopeus ei saa ylittää maksimiarvoa
-    if (combinedVel.sizeOf() > maxVel) {
-      val k = maxVel / combinedVel.sizeOf()
-      combinedVel *=  k
+    if (arrVel.sizeOf() > maxVel) {
+      val k = maxVel / arrVel.sizeOf()
+      arrVel *=  k
     }
     
-    val wallRep = wallRepulsion(combinedVel)
+    //seinien aiheuttama hylkimisnopeus
+    val wallRep = wallRepulsion(arrVel)
     
-    combinedVel += wallRep
+    var combinedVel = arrVel + wallRep
     
     //nopeus ei saa ylittää maksimiarvoa
     if (combinedVel.sizeOf() > maxVel) {
@@ -59,6 +51,7 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
       combinedVel = combinedVel * k
     }
     
+    //nopeus, jolla väistetään takana olevaa johtajaa
     val velAvoidance = avoidanceVelocity()
     combinedVel += velAvoidance
     
@@ -68,6 +61,7 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
       combinedVel = combinedVel * k
     }
     
+    //kokonaisnopeuteen lisätään vielä toisten alusten aiheuttama hylkimisnopeus
     var totalVel = combinedVel + separationVelocity()
     
     //nopeus ei saa ylittää maksimiarvoa
@@ -80,12 +74,11 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     
   }
   
-  
+  //nopeus jolla pyritään kohti kohdetta johtajan takana
   def arrivalVelocity() = {
     
     //lasketaan suunta kohteeseen
-    //val direction = world.leader.place - place
-    val direction = world.leader.followerTarget - place
+    val direction = world.getLeader().followerTarget - place
     
     //lasketaan tarvittava muutosnopeusvektori
     var steerDir = direction + velocity
@@ -111,26 +104,28 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     
   }
   
-  
+  //seinien aiheuttama hylkimisnopeus
   def wallRepulsion(combVel: Vector2D) = {
     
     //lasketaan seinien repulsiot eri suunnille ja seinille
     var velX = 0.0
     var velY = 0.0
+    
+    //hylkimistä tapahtuu vain riittävän lähellä seiniä
     if (place.x < 100) {
-      velX =  2 * world.followerMaxVelocity / ( 1 + place.x)
+      velX =  2 * world.followerMaxVelocity / ( 1 + {if(place.x - 15 > 0)place.x - 15 else 0} )
     }
     
     if (place.x > world.width - 100) {
-      velX =  -(2 * world.followerMaxVelocity / ( 1 + world.width - place.x))
+      velX =  -(2 * world.followerMaxVelocity / ( 1 + {if(world.width - place.x - 15 > 0)world.width - place.x - 15 else 0} ))
     }
     
     if (place.y < 100) {
-      velY =  2 * world.followerMaxVelocity / ( 1 + place.y)
+      velY =  2 * world.followerMaxVelocity / ( 1 + {if(place.y - 15 > 0)place.y - 15 else 0} )
     }
     
     if (place.y > world.height - 100) {
-      velY = -(2 * world.followerMaxVelocity / ( 1 + world.height - place.y))
+      velY = -(2 * world.followerMaxVelocity / ( 1 +  {if(world.height - place.y - 15 > 0)world.height - place.y - 15 else 0} ))
     }
     
     val velRep = Vector2D(velX, velY)
@@ -139,58 +134,57 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
      
   }
   
+  //johtajan edessä olevaan seuraajaan kohdistuu hylkimisvoima johtajan nopeuden normaalin suuntaisesti
   def avoidanceVelocity() = {
     
+    //vektoreita nopeuden laskemiseksi
     var avoidanceVector = Vector2D(0,0)
     var avoidanceVelocity = Vector2D(0,0)
     var leaderVector = Vector2D(0,0)
-    //var x = 0.0
-    //var y = 0.0
     
-    if (world.leader.velocity.y != 0 && world.leader.velocity.x != 0) {
+    //lasketaan nopeus vain, jos johtajan nopeuskomponentit x ja y eroavat nollasta,
+    //koska näillä arvoilla suorien kulmakertoimia ei voi laskea
+    if (world.getLeader().velocity.y != 0 && world.getLeader().velocity.x != 0) {
       
       //lasketaan johtajan nopeusvektorin määräämä suoran- ja normaalin kulmakerroin
-      val k = world.leader.velocity.y / world.leader.velocity.x
+      val k = world.getLeader().velocity.y / world.getLeader().velocity.x
       val kNormal = -1/k
       
       //lasketaan seuraajan paikan ja nopeuden määräämän suoran leikkauspiste johtajan suoran kanssa
-      val x = (1/k * this.place.x + this.place.y + k * world.leader.place.x - world.leader.place.y) / (k + 1/k)
-      val y = k * x - k * world.leader.place.x + world.leader.place.y
+      val x = (1/k * this.place.x + this.place.y + k * world.getLeader().place.x - world.getLeader().place.y) / (k + 1/k)
+      val y = k * x - k * world.getLeader().place.x + world.getLeader().place.y
       //print("x: ", x, "y: ", y)
       
       //lasketaan vektori pisteestä seuraajan paikkaan
       avoidanceVector = this.place - Vector2D(x, y)
-      //print("AvoidanceVector: ", avoidanceVector)
       
       //lasketaan vektori johtajan paikasta leikkauspisteeseen
-      leaderVector = Vector2D(x, y) - world.leader.place
+      leaderVector = Vector2D(x, y) - world.getLeader().place
       
     }
-    
-    
     
     //lasketaan välttelyvektorin pituus ja määrätään välttelynopeus,
     //mikäli seuraaja on tarpeeksi lähellä seuraajan edellä, jolloin vektorien x ja y komponentit ovat samanmerkkisiä
     val disAvoidanceVector = avoidanceVector.sizeOf()
-    if (disAvoidanceVector != 0 && disAvoidanceVector < 100 && leaderVector.sizeOf() < 200 && leaderVector.x * world.leader.velocity.x >= 0 && leaderVector.y * world.leader.velocity.y >= 0) {
+    if (disAvoidanceVector != 0 && disAvoidanceVector < 100 && leaderVector.sizeOf() < 200 && leaderVector.x * world.getLeader().velocity.x >= 0 && leaderVector.y * world.getLeader().velocity.y >= 0) {
       avoidanceVelocity =  avoidanceVector / disAvoidanceVector * world.followerMaxVelocity / ( 1 + disAvoidanceVector)
-      //print("AvoidanceVelocity: ", avoidanceVelocity)
     }
     
     avoidanceVelocity
     
   }
   
-  
+  //alusten toisiinsa kohdistaama hylkimisnopeus
   def separationVelocity() = {
+    
     var sepVel = Vector2D(0,0)
     
-    for (follower <- world.followers) {
+    //lasketaan hylkimisnopeus kaikista muista seuraajista
+    for (follower <- world.getFollowers()) {
       
       if (follower equals this) {
       }
       
-      //jos seuraaja on jokin toinen
       else {
         //lasketaan etäisyys seuraajien välillä
         val distanceVector = this.place - follower.place 
@@ -198,26 +192,27 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
         
         //jos seuraajat ovat tarpeeksi lähellä, hylkivät ne toisiaan
         if (distance < separationDistance) {
+          
           //jokaisen seuraajan hylkimisnopeus lasketaan yhteen
-          val sepVelFollower =  distanceVector / distanceVector.sizeOf() * 2 * world.followerMaxVelocity / ( 1 + distance)
+          val sepVelFollower =  distanceVector / distanceVector.sizeOf() * 2 * world.followerMaxVelocity / ( 1 + {if(distance - 15 > 0)distance - 15 else 0} )
           sepVel += sepVelFollower
         }
       }
     }
     
     //lasketaan vielä hylkimisnopeus johtajasta
-    val distanceVector = this.place - world.leader.place 
+    val distanceVector = this.place - world.getLeader().place 
     val distance = distanceVector.sizeOf()
     
     //jos johtaja ovat tarpeeksi lähellä, hylkii se seuraajaa
     if (distance < separationDistance) {
+      
       //lasketaan hylkimisnopeus ja ynnätään se jo summattuihin
-      val sepVelLeader =  distanceVector / distanceVector.sizeOf() * 4 * world.followerMaxVelocity / ( 1 + distance)
+      val sepVelLeader =  distanceVector / distanceVector.sizeOf() * 4 * world.followerMaxVelocity / ( 1 + {if(distance - 15 > 0)distance - 15 else 0})
       sepVel += sepVelLeader
     }
     
     sepVel
-    
     
   }
   

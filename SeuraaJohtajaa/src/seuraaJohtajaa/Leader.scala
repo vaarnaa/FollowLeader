@@ -5,29 +5,30 @@ import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.awt.geom.AffineTransform
 
+//johtajaalusta kuvaava luokka
 class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: BufferedImage) extends Ship(_world, _velocity, _place, _img) {
   
-  //val world.maxVelocity = 2.0
-  //val maxVelChange = 0.04
-  //var maxVelChange = world.leaderMaxVelocity / world.mass
-  val minDistance = 50
-  var wanderingRadius: Double = 0
-  var wanderAngle: Double = 0
+  //muuttujia wanderingVelocity metodia varten
+  private var wanderingRadius: Double = 0
+  private var wanderAngle: Double = 0
+  
+  //seuraaja-alusten kohde
   var followerTarget = Vector2D(world.width / 2, world.height / 2)
   
   
+  //liikutetaan johtajaa uuteen paikkaan
   def move() {
     
-    //update followerTarget
+    //päivitetään seuraajien kohde 100 yksikköä johtajan taakse
     if (velocity.sizeOf() > 0) {
-      val leaderVel = world.leader.velocity
+      val leaderVel = this.velocity
       val leaderVelSize = leaderVel.sizeOf()
       val leaderVelUnit = leaderVel / leaderVelSize
-      followerTarget = world.leader.place - leaderVelUnit * 30   
+      followerTarget = this.place - leaderVelUnit * 100   
     }
     
     //tutkitaan etäisyys kohteeseen
-    val direction = world.target - place
+    val direction = world.target.get - place
     
     //muutetaan kohteen sijaintia jos ollaan lähellä
     if (direction.sizeOf() < 30) {
@@ -42,14 +43,16 @@ class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffere
     place = place + Vector2D(velocity.x, velocity.y)
   }
   
-  
+  //lasketaan johtajan uusi nopeus
   def calculateVelocity() = {
     
+    //lasketaan nopeus seeking- ja wanderingVelocity metodien summana
     val seekVel = seekingVelocity()
     val wandVel = wanderingVelocity(seekVel)
     var combinedVel = seekVel + wandVel
     
-    val direction = world.target - place
+    //jos ollaan tarpeeksi lähellä kohdetta, lasketaan nopeutta
+    val direction = world.target.get - place
     val maxVel = { //maksiminopeus riippuu etäisyydestä kohteeseen
       if (direction.sizeOf() < 200) Math.min(Math.max(direction.sizeOf() / 100 * world.leaderMaxVelocity, 0.005), world.leaderMaxVelocity)
       else world.leaderMaxVelocity
@@ -61,11 +64,12 @@ class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffere
       combinedVel *=  k
     }
     
+    //seinien aiheuttama hylkimisnopeus
     val wallRep = wallRepulsion(combinedVel)
-    
+     
     var totalVel = combinedVel + wallRep
     
-    //nopeus ei saa ylittää maksimiarvoa
+    //uusi nopeus ei saa ylittää maksimiarvoa
     if (totalVel.sizeOf() > maxVel) {
       val k = maxVel / totalVel.sizeOf()
       totalVel = totalVel * k
@@ -75,11 +79,11 @@ class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffere
     
   }
   
-  
+  //lasketaan nopeus, jolla pyritään kohti kohdetta
   def seekingVelocity() = {
     
     //lasketaan suunta kohteeseen
-    val direction = world.target - place
+    val direction = world.target.get - place
     
     //lasketaan tarvittava muutosnopeusvektori
     var steerDir = direction + velocity
@@ -88,7 +92,7 @@ class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffere
       steerDir = steerDir * k
     }
     
-    //lasketaan uusi nopeusvektori
+    //lasketaan uusi nopeusvektori ja etäisyydestä riippuva maksiminopeus
     var newVel = velocity + steerDir
     val maxVel = { //maksiminopeus riippuu etäisyydestä kohteeseen
       if (direction.sizeOf() < 200) Math.min(direction.sizeOf() / 50 * world.leaderMaxVelocity, world.leaderMaxVelocity)
@@ -105,7 +109,7 @@ class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffere
     
   }
   
-  
+  //lasketaan nopeus, jolla poikkeatetaan suunta seekingVeocityn metodin arvosta ns. pyöristetään mutkia
   def wanderingVelocity(seekVel: Vector2D) = {
     
     //lasketaan wanderinging nopeusvektorin pituus
@@ -136,43 +140,44 @@ class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffere
     val velAngleChange = velNewAngle - velOldAngle
     
     //lasketaan wandering nopeuden kulman muutos
-    //val wandAngleChange = Math.min(util.Random.nextDouble() / 100 * Math.abs(velAngleChange), 0.05)
-    //if (util.Random.nextDouble() < 0.5) wanderAngle -=wandAnglechange
-    //else wanderAngle += wandAnglechange
+    //se on maksimissaan sadas osa seekingVelocityn aiheuttamasta kulmanmuutoksesta
     val wandAngleChange = util.Random.nextDouble() / 100 * Math.abs(velAngleChange)
     if (util.Random.nextDouble() < 0.5) wanderAngle = wandAngleChange
     else wanderAngle = (-1) * wandAngleChange
-    //wanderAngle = wandAngleChange
     
+    //vaeltelu nopeus
     val wanderVel = Vector2D(wanderingRadius * Math.cos(wanderAngle + velNewAngle), wanderingRadius * Math.sin(wanderAngle + velNewAngle))
-    val check = Vector2D(seekVelSize * Math.cos(wanderAngle + velNewAngle), seekVelSize * Math.sin(wanderAngle + velNewAngle))
     
     wanderVel
     
   }
   
-  
+  //seinien aiheuttama hylkimisnopeus
   def wallRepulsion(combVel: Vector2D) = {
     
     //lasketaan seinien repulsiot eri suunnille ja seinille
     var velX = 0.0
     var velY = 0.0
+    
+    //repulsiota on vain tietyllä etäisyydellä seinistä
+    
     if (place.x < 100) {
-      velX =  2 * world.leaderMaxVelocity / ( 1 + {if(place.x - 20 < 0)place.x else place.x - 20})
+      velX =  2 * world.leaderMaxVelocity / ( 1 + {if(place.x - 15 > 0)place.x - 15 else 0} )
     }
     
     if (place.x > world.width - 100) {
-      velX =  -(2 * world.leaderMaxVelocity / ( 1 + {if(world.width - place.x - 20 < 0)world.width - place.x else world.width - place.x - 20}))
+      velX =  -(2 * world.leaderMaxVelocity / ( 1 + {if(world.width - place.x - 15 > 0)world.width - place.x - 15 else 0} ))
     }
     
     if (place.y < 100) {
-      velY =  2 * world.leaderMaxVelocity / ( 1 + {if(place.y - 10 < 0)place.y else place.y - 10})
+      velY =  2 * world.leaderMaxVelocity / ( 1 + {if(place.y - 15 > 0)place.y - 15 else 0} )
     }
     
     if (place.y > world.height - 100) {
-      velY = -(2 * world.leaderMaxVelocity / ( 1 + {if(world.height - place.y - 20 < 0)world.height - place.y else world.height - place.y - 20}))
+      velY = -(2 * world.leaderMaxVelocity / ( 1 + {if(world.height - place.y - 15 > 0)world.height - place.y - 15 else 0}))
     }
     
+    //hylkimisnopeus
     val velRep = Vector2D(velX, velY)
     
     velRep
