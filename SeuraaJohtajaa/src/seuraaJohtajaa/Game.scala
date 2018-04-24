@@ -331,7 +331,7 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
         
       }
       case ButtonClicked(`buttonAddFollower`) => {
-        if (gameWorld.addFollower()) {
+        if (gameState != 0 && gameWorld.addFollower()) {
           commandText.text = "Follower added"
         }
         else {

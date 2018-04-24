@@ -17,23 +17,47 @@ class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: 
   var followerMaxVelocity = maxVelocity
   var maxVelChange = maxVelocity / mass
   
-  //alusten kuvat
-  val imgLeader = ImageIO.read(new File("alus_musta.png"))
-  val imgFollower = ImageIO.read(new File("alus2.png"))
+  //johtaja-aluksen kuva
+  val imgLeader = {
+    try {
+           ImageIO.read(new File("alus_musta.png"))
+          
+        } 
+      catch {
+        case e: IOException => {
+          println("Couldn't load image: alus_mustaa.png")
+          println("Closing program")
+          sys.exit(0)  
+        }
+      }
+  }
+  
+  //seuraaja-aluksen kuva
+  val imgFollower = {
+    try {
+           ImageIO.read(new File("alus2.png"))
+          
+        } 
+      catch {
+        case e: IOException => {
+          println("Couldn't load image: alus2.png")
+          println("Closing program")
+          sys.exit(0)  
+        }
+      }
+  }
   
   //alustetaan johtajan kohde ja johtaja tyhjiksi
   var target: Option[Vector2D] = None
   private var leader: Option[Leader] = None
   
   
-  
-   
-   //metodi, joka laskee uuden maksimimuutosnopeuden
+   //laskee uuden maksimimuutosnopeuden
    def newMaxVelChange() = {
      maxVelChange = maxVelocity / mass
    }
   
-  ////metodi, joka uuden simulaation alussa tyhjentää seuraajat puskurista ja luo johtajan ja seuraajan
+  //tyhjentää seuraajat puskurista ja luo johtajan ja seuraajan simulaation alussa
   def createInitialShips() = {
      createLeader()
      followers.clear

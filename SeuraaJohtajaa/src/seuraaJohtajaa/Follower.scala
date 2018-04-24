@@ -208,7 +208,7 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     if (distance < separationDistance) {
       
       //lasketaan hylkimisnopeus ja ynnätään se jo summattuihin
-      val sepVelLeader =  distanceVector / distanceVector.sizeOf() * 4 * world.followerMaxVelocity / ( 1 + {if(distance - 15 > 0)distance - 15 else 0})
+      val sepVelLeader =  distanceVector / distanceVector.sizeOf() * 2 * world.followerMaxVelocity / ( 1 + {if(distance - 15 > 0)distance - 15 else 0})
       sepVel += sepVelLeader
     }
     
