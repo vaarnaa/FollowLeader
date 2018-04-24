@@ -38,6 +38,7 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
     val buttonPause = new Button("Pause") { font = new Font("Arial", 0, 16)}
     val buttonAddFollower = new Button("Add follower") { font = new Font("Arial", 0, 16)}
     val buttonRemoveFollower = new Button("Remove follower") { font = new Font("Arial", 0, 16)}
+    val buttonChangeMode = new Button("Change mode") { font = new Font("Arial", 0, 16)}
     
     val buttons = new FlowPanel {
       background = Color.white
@@ -45,6 +46,7 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
       contents += buttonPause
       contents += buttonAddFollower
       contents += buttonRemoveFollower
+      contents += buttonChangeMode
     }
     
     /*
@@ -87,6 +89,8 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
     class Arena(width: Int, height: Int) extends Panel {
       
       preferredSize = new Dimension(width, height)
+      minimumSize   = new Dimension(width, height)
+      maximumSize   = new Dimension(width,height)
       border = LineBorder(Color.black)
       
       override def paintComponent(g: Graphics2D) = {
@@ -200,6 +204,7 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
     listenTo(buttonChangeDisplayDelay)
     listenTo(buttonAddFollower)
     listenTo(buttonRemoveFollower)
+    listenTo(buttonChangeMode)
     listenTo(gameArea.mouse.clicks)
       
     //tapahtumiin reagointi
@@ -334,16 +339,26 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
         if (gameState != 0 && gameWorld.addFollower()) {
           commandText.text = "Follower added"
         }
-        else {
+        else if (gameState != 0){
           commandText.text = ""
         }
       }
       case ButtonClicked(`buttonRemoveFollower`) => {
-        if (gameWorld.removeFollower()) {
+        if (gameState != 0 && gameWorld.removeFollower()) {
           commandText.text = "Follower removed"
         }
-        else {
+        else if (gameState != 0){
           commandText.text = ""
+        }
+      }
+      case ButtonClicked(`buttonChangeMode`) => {
+        if (gameState != 0 && gameWorld.inFleetMode) {
+          commandText.text = "Game mode changed to line mode"
+          gameWorld.inFleetMode = false
+        }
+        else if (gameState != 0) {
+          commandText.text = "Game mode changed to fleet mode"
+          gameWorld.inFleetMode = true
         }
       }
       case MouseClicked(_, p, _, _, _) => {
@@ -392,9 +407,6 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
         gameTimer.restart()
         gameState = 1
         commandText.text = "Game restarted"
-      }
-      else {
-        commandText.text = ""
       }
     }
     

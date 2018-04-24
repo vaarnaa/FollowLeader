@@ -8,11 +8,22 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     
   
   //minimietäisyys, jolla alukset hylkivät toisiaan
-  private val separationDistance = 50
+  private val separationDistance = 60
+  
+  //seuraajien kohde jonomoodissa
+  var nextFollowerTarget = this.place
   
   
   //liikutetaan seuraaja uuteen paikkaan
   def move() {
+    
+    //päivitetään seuraajien jonomoodin kohde 20 yksikköä seuraajan taakse
+    if (velocity.sizeOf() > 0) {
+      val followerVel = this.velocity
+      val followerVelSize = followerVel.sizeOf()
+      val followerVelUnit = followerVel / followerVelSize
+      nextFollowerTarget = this.place - followerVelUnit * 20   
+    }
     
     //lasketaan uusi nopeus
     velocity = calculateVelocity()
@@ -77,9 +88,17 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
   //nopeus jolla pyritään kohti kohdetta johtajan takana
   def arrivalVelocity() = {
     
-    //lasketaan suunta kohteeseen
-    val direction = world.getLeader().followerTarget - place
+    val followers = world.getFollowers()
+    var direction = Vector2D(0,0)
     
+    //lasketaan suunta kohteeseen, moodista riippuen joko johtajan tai edellisen seuraajan taakse
+    if (world.inFleetMode || (this equals followers.head))
+      direction = world.getLeader().followerTarget - place
+    else {
+      direction = followers(followers.indexOf(this) - 1).nextFollowerTarget - place
+    }
+      
+      
     //lasketaan tarvittava muutosnopeusvektori
     var steerDir = direction + velocity
     if (steerDir.sizeOf() > world.maxVelChange) { //nopeuden muutos ei saa ylittää maksimiarvoa
@@ -167,7 +186,7 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     //mikäli seuraaja on tarpeeksi lähellä seuraajan edellä, jolloin vektorien x ja y komponentit ovat samanmerkkisiä
     val disAvoidanceVector = avoidanceVector.sizeOf()
     if (disAvoidanceVector != 0 && disAvoidanceVector < 100 && leaderVector.sizeOf() < 200 && leaderVector.x * world.getLeader().velocity.x >= 0 && leaderVector.y * world.getLeader().velocity.y >= 0) {
-      avoidanceVelocity =  avoidanceVector / disAvoidanceVector * world.followerMaxVelocity / ( 1 + disAvoidanceVector)
+      avoidanceVelocity =  avoidanceVector / disAvoidanceVector * world.followerMaxVelocity / ( 1 + {if(disAvoidanceVector - 50 > 0)disAvoidanceVector - 50 else 0} )
     }
     
     avoidanceVelocity
@@ -194,7 +213,7 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
         if (distance < separationDistance) {
           
           //jokaisen seuraajan hylkimisnopeus lasketaan yhteen
-          val sepVelFollower =  distanceVector / distanceVector.sizeOf() * 2 * world.followerMaxVelocity / ( 1 + {if(distance - 15 > 0)distance - 15 else 0} )
+          val sepVelFollower =  distanceVector / distanceVector.sizeOf() * 1 * world.followerMaxVelocity / ( 1 + {if(distance - 20 > 0)distance - 20 else 0} )
           sepVel += sepVelFollower
         }
       }
@@ -208,7 +227,7 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     if (distance < separationDistance) {
       
       //lasketaan hylkimisnopeus ja ynnätään se jo summattuihin
-      val sepVelLeader =  distanceVector / distanceVector.sizeOf() * 2 * world.followerMaxVelocity / ( 1 + {if(distance - 15 > 0)distance - 15 else 0})
+      val sepVelLeader =  distanceVector / distanceVector.sizeOf() * 1 * world.followerMaxVelocity / ( 1 + {if(distance - 20 > 0)distance - 20 else 0})
       sepVel += sepVelLeader
     }
     

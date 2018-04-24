@@ -2,12 +2,9 @@ package seuraaJohtajaa
 
 import seuraaJohtajaa._
 import java.awt.image.BufferedImage
-import org.scalatest._
 import org.scalatest.Assertions._
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
-
-import collection.mutable.Stack
 
 class GameTest extends FlatSpec {
   
@@ -24,7 +21,7 @@ class GameTest extends FlatSpec {
     assertThrows[NoSuchElementException] {
       world.getLeader()
     }
-    assert(world.target == None)
+    assert(world.target.isEmpty)
   }
   
   it should "have pictures for both ships" in {
@@ -32,9 +29,9 @@ class GameTest extends FlatSpec {
     assert(world.imgFollower.isInstanceOf[BufferedImage])
   }
   
-  "Method createInitialShips" should "create one follower and leader" in {
+  "Method createInitialShips" should "create three followers and a leader" in {
     world.createInitialShips()
-    assert(world.getFollowers().size == 1)
+    assert(world.getFollowers().size == 3)
     assert(world.getLeader().isInstanceOf[Leader])
   }
   

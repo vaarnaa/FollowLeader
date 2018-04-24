@@ -13,7 +13,7 @@ class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffere
   private var wanderAngle: Double = 0
   
   //seuraaja-alusten kohde
-  var followerTarget = Vector2D(world.width / 2, world.height / 2)
+  var followerTarget = this.place//ector2D(world.width / 2, world.height / 2)
   
   
   //liikutetaan johtajaa uuteen paikkaan

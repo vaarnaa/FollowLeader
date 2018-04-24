@@ -17,6 +17,9 @@ class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: 
   var followerMaxVelocity = maxVelocity
   var maxVelChange = maxVelocity / mass
   
+  //kertoo seuraavatko alukset johtajaa vai toisiaan
+  var inFleetMode = true
+  
   //johtaja-aluksen kuva
   val imgLeader = {
     try {
@@ -57,11 +60,13 @@ class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: 
      maxVelChange = maxVelocity / mass
    }
   
-  //tyhjentää seuraajat puskurista ja luo johtajan ja seuraajan simulaation alussa
+  //tyhjentää seuraajat puskurista ja luo johtajan ja kolme seuraajaa simulaation alussa
   def createInitialShips() = {
      createLeader()
      followers.clear
-     addFollower()
+     for(_ <- 1 to 3) {
+       addFollower()
+     }
    }
    
    //luo uuden johtajan satunnaiseen paikkaan
@@ -87,7 +92,7 @@ class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: 
    
   //luo uuden seuraajan satunnaiseen paikkaan ja lisää sen puskuriin
   def addFollower() = {
-     if (followers.size < 30 && leader != null) followers.synchronized {
+     if (followers.size < 50 && leader != null) followers.synchronized {
        val x = util.Random.nextDouble
        val y = util.Random.nextDouble
        followers += new Follower(
