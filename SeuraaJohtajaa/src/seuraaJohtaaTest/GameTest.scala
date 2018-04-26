@@ -9,7 +9,7 @@ import org.scalatest.Matchers
 class GameTest extends FlatSpec {
   
   val maxVelocity = 2.0
-  val mass = 60.0
+  val mass = 50.0
   val width = 600
   val height = 600
   
@@ -35,7 +35,7 @@ class GameTest extends FlatSpec {
     assert(world.getLeader().isInstanceOf[Leader])
   }
   
-  "Method addFollower" should "work if there are less than 30 followers" in {
+  "Method addFollower" should "work if there are less than 50 followers" in {
     
     while(followers.size < 30) {
       world.addFollower()
@@ -56,9 +56,10 @@ class GameTest extends FlatSpec {
   }
   
   
-  "Follower target" should "update correctly to 100 units behind leader" in {
+  "In fleet mode follower target" should "update correctly to 100 units behind leader" in {
     val leader = world.getLeader()
     world.target = Some(Vector2D(300,300))
+    world.inFleetMode = true
     
     leader.place = Vector2D(200,300)
     leader.velocity = Vector2D(1,0)

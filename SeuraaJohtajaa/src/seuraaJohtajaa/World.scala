@@ -89,16 +89,17 @@ class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: 
   def getLeader() = {
     leader.get
   }
+  
    
   //luo uuden seuraajan satunnaiseen paikkaan ja lisää sen puskuriin
   def addFollower() = {
-     if (followers.size < 50 && leader != null) followers.synchronized {
+     if (followers.size < 30 && leader != null) followers.synchronized {
        val x = util.Random.nextDouble
        val y = util.Random.nextDouble
        followers += new Follower(
         this,
         Vector2D(if (x < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble, if (y < 0.5) util.Random.nextDouble else (-1) * util.Random.nextDouble),
-        Vector2D(util.Random.nextInt(width * 7 / 10) + 100, util.Random.nextInt(height * 7 / 10) + 100),
+        Vector2D(util.Random.nextInt(width - 100) + 50, util.Random.nextInt(height - 100) + 50),
         imgFollower)
        true
      }

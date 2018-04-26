@@ -213,7 +213,7 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
         if (distance < separationDistance) {
           
           //jokaisen seuraajan hylkimisnopeus lasketaan yhteen
-          val sepVelFollower =  distanceVector / distanceVector.sizeOf() * 1 * world.followerMaxVelocity / ( 1 + {if(distance - 20 > 0)distance - 20 else 0} )
+          val sepVelFollower =  distanceVector / distanceVector.sizeOf() * 1 * Math.max(world.followerMaxVelocity, 1) / ( 1 + {if(distance - 30 > 0)distance - 30 else 0} )
           sepVel += sepVelFollower
         }
       }
@@ -223,11 +223,12 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     val distanceVector = this.place - world.getLeader().place 
     val distance = distanceVector.sizeOf()
     
-    //jos johtaja ovat tarpeeksi lähellä, hylkii se seuraajaa
+    //jos johtaja on tarpeeksi lähellä, hylkii se seuraajaa
+    //ilman johtajan huomioimista metodissa, törmäisi johtaja seuraajiin hiljaisilla nopeuksilla
     if (distance < separationDistance) {
       
       //lasketaan hylkimisnopeus ja ynnätään se jo summattuihin
-      val sepVelLeader =  distanceVector / distanceVector.sizeOf() * 1 * world.followerMaxVelocity / ( 1 + {if(distance - 20 > 0)distance - 20 else 0})
+      val sepVelLeader =  distanceVector / distanceVector.sizeOf() * 1 * Math.max(world.followerMaxVelocity, 1) / ( 1 + {if(distance - 30 > 0)distance - 30 else 0})
       sepVel += sepVelLeader
     }
     

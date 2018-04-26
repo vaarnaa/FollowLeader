@@ -112,9 +112,16 @@ class Leader(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffere
   //lasketaan nopeus, jolla poikkeatetaan suunta seekingVeocityn metodin arvosta ns. pyöristetään mutkia
   def wanderingVelocity(seekVel: Vector2D) = {
     
-    //lasketaan wanderinging nopeusvektorin pituus
+    //lasketaan wandering nopeusvektorin pituus
     val seekVelSize = seekVel.sizeOf()
-    wanderingRadius = Math.min(seekVelSize / 10, 0.5)
+    //vähentää äkkikäännöksiä pienillä nopeuksilla
+    wanderingRadius = Math.max(seekVelSize / 10, world.leaderMaxVelocity / 20)
+      /*{
+      if (world.leaderMaxVelocity >= 2) Math.max(seekVelSize / 10, 0.1)
+      if (world.leaderMaxVelocity >= 1.6) Math.max(seekVelSize / 10, 0.08)
+      if (world.leaderMaxVelocity >= 1) Math.max(seekVelSize / 10, 0.05)
+      else Math.max(seekVelSize / 10, 0.1/ world.leaderMaxVelocity)
+      }*/ 
     
     //lasketaan vanhan nopeuden kulma
     val velOldAngle = {

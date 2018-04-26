@@ -211,13 +211,13 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
     reactions += {
       case ButtonClicked(`buttonPause`) => pause()
       case ButtonClicked(`buttonChangeShipMaxSpeed`) => {
-        var inputLine = showInput(contents.head, "New ship max speed: (0 < x <= 4)", "Select new ship max speed", Message.Question, Swing.EmptyIcon, Nil, "")
-        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble > 0) || !(inputLine.get.toDouble <= 4))) {
+        var inputLine = showInput(contents.head, "New ship max speed: (0.1 <= x <= 4)", "Select new ship max speed", Message.Question, Swing.EmptyIcon, Nil, "")
+        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble >= 0.1) || !(inputLine.get.toDouble <= 4))) {
           if (inputLine.exists(_ == None)) {
             Unit
           }
           else {
-            inputLine = showInput(contents.head, "Please enter a double between 0 and 4.0" + "\n" + "New ship max speed (0 < x <= 4)", "Select new ship max speed", Message.Error, Swing.EmptyIcon, Nil, "")    
+            inputLine = showInput(contents.head, "Please enter a double between 0.1 and 4.0" + "\n" + "New ship max speed (0.1 <= x <= 4)", "Select new ship max speed", Message.Error, Swing.EmptyIcon, Nil, "")    
           }
         }
         
@@ -233,13 +233,13 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
         
       }
       case ButtonClicked(`buttonChangeLeaderMaxSpeed`) => {
-        var inputLine = showInput(contents.head, "New leader max speed: (0 < x <= 4)", "Select new leader max speed", Message.Question, Swing.EmptyIcon, Nil, "")
-        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble > 0) || !(inputLine.get.toDouble <= 4))) {
+        var inputLine = showInput(contents.head, "New leader max speed: (0.1 <= x <= 4)", "Select new leader max speed", Message.Question, Swing.EmptyIcon, Nil, "")
+        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble >= 0.1) || !(inputLine.get.toDouble <= 4))) {
           if (inputLine.exists(_ == None)) {
             Unit
           }
           else {
-            inputLine = showInput(contents.head, "Please enter a double between 0 and 4.0" + "\n" + "New leader max speed (0 < x <= 4)", "Select new leader max speed", Message.Error, Swing.EmptyIcon, Nil, "")    
+            inputLine = showInput(contents.head, "Please enter a double between 0.1 and 4.0" + "\n" + "New leader max speed: (0.1 <= x <= 4)", "Select new leader max speed", Message.Error, Swing.EmptyIcon, Nil, "")    
           }
         }
         
@@ -250,10 +250,11 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
           
           //seuraajien nopeus ei voi olla alle johtaja-aluksen nopeuden
           if (gameWorld.followerMaxVelocity < maxLeaderVelocity) {
-            gameWorld.followerMaxVelocity = maxLeaderVelocity
             maxVelocity = maxLeaderVelocity
             gameWorld.maxVelocity = maxVelocity
             commandText.text = "Ship max speed changed to " + maxLeaderVelocity.toString
+            gameWorld.followerMaxVelocity = maxLeaderVelocity
+            
           }
           else {
             commandText.text = "Leader max speed changed to " + maxLeaderVelocity.toString
@@ -262,13 +263,13 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
         }
       }
       case ButtonClicked(`buttonChangeFollowerMaxSpeed`) => {
-        var inputLine = showInput(contents.head, "New follower max speed: (0 < x <= 4)", "Select new follower max speed", Message.Question, Swing.EmptyIcon, Nil, "")
-        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble > 0) || !(inputLine.get.toDouble <= 4))) {
+        var inputLine = showInput(contents.head, "New follower max speed: (0.1 <= x <= 4)", "Select new follower max speed", Message.Question, Swing.EmptyIcon, Nil, "")
+        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble >= 0.1) || !(inputLine.get.toDouble <= 4))) {
           if (inputLine.exists(_ == None)) {
             Unit
           }
           else {
-            inputLine = showInput(contents.head, "Please enter a double between 0 and 4.0" + "\n" + "New follower max speed (0 < x <= 4)", "Select new follower max speed", Message.Error, Swing.EmptyIcon, Nil, "")    
+            inputLine = showInput(contents.head, "Please enter a double between 0.1 and 4.0" + "\n" + "New follower max speed: (0.1 <= x <= 4)", "Select new follower max speed", Message.Error, Swing.EmptyIcon, Nil, "")    
           }
         }
         
@@ -291,13 +292,13 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
         }
       }
       case ButtonClicked(`buttonChangeShipMass`) => {
-        var inputLine = showInput(contents.head, "New ship mass: (30 <= x <= 100)", "Select new ship mass", Message.Question, Swing.EmptyIcon, Nil, "")
-        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble >= 30) || !(inputLine.get.toDouble <= 100))) {
+        var inputLine = showInput(contents.head, "New ship mass: (30 <= x <= 70)", "Select new ship mass", Message.Question, Swing.EmptyIcon, Nil, "")
+        while (!(inputLine == None) && (!isDouble(inputLine) || !(inputLine.get.toDouble >= 30) || !(inputLine.get.toDouble <= 70))) {
           if (inputLine.exists(_ == None)) {
             Unit
           }
           else {
-            inputLine = showInput(contents.head, "Please enter a double between 30 and 100" + "\n" + "New ship mass", "Select new ship mass", Message.Error, Swing.EmptyIcon, Nil, "")    
+            inputLine = showInput(contents.head, "Please enter a double between 30 and 70" + "\n" + "New ship mass: (30 <= x <= 70)", "Select new ship mass", Message.Error, Swing.EmptyIcon, Nil, "")    
           }
         }
         
@@ -317,7 +318,7 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
             Unit
           }
           else {
-            inputLine = showInput(contents.head, "Please enter an int between 1 and 10" + "\n" + "New display delay", "Select new display delay", Message.Error, Swing.EmptyIcon, Nil, "")   
+            inputLine = showInput(contents.head, "Please enter an int between 1 and 10" + "\n" + "New display delay: (1 <= x <= 10)", "Select new display delay", Message.Error, Swing.EmptyIcon, Nil, "")   
           }
         }
         
@@ -353,7 +354,7 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
       }
       case ButtonClicked(`buttonChangeMode`) => {
         if (gameState != 0 && gameWorld.inFleetMode) {
-          commandText.text = "Game mode changed to line mode"
+          commandText.text = "Game mode changed to queue mode"
           gameWorld.inFleetMode = false
         }
         else if (gameState != 0) {
@@ -462,7 +463,7 @@ object Game extends SimpleSwingApplication {
   val defaultWidth      = 600
   val defaultHeight     = 600
   val defaultMaxVelocity = 2.0
-  val defaultMass = 60
+  val defaultMass = 50
   
   //luodaan uusi pelimaailma
   var gameWorld = new World(defaultHeight, defaultWidth, defaultMaxVelocity, defaultMass)
