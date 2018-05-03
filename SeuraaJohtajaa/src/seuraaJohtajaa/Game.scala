@@ -259,6 +259,7 @@ class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defau
           else {
             commandText.text = "Leader max speed changed to " + maxLeaderVelocity.toString
           }
+          maxVelocity = maxLeaderVelocity
           updatePrintValues()
         }
       }

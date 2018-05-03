@@ -28,7 +28,7 @@ class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: 
         } 
       catch {
         case e: IOException => {
-          println("Couldn't load image: alus_mustaa.png")
+          println("Couldn't load image: alus_musta.png")
           println("Closing program")
           sys.exit(0)  
         }
@@ -93,7 +93,7 @@ class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: 
    
   //luo uuden seuraajan satunnaiseen paikkaan ja lisää sen puskuriin
   def addFollower() = {
-     if (followers.size < 30 && leader != null) followers.synchronized {
+     if (followers.size < 30 && !leader.isEmpty) followers.synchronized {
        val x = util.Random.nextDouble
        val y = util.Random.nextDouble
        followers += new Follower(

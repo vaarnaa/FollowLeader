@@ -35,7 +35,7 @@ class GameTest extends FlatSpec {
     assert(world.getLeader().isInstanceOf[Leader])
   }
   
-  "Method addFollower" should "work if there are less than 50 followers" in {
+  "Method addFollower" should "work if there are less than 30 followers" in {
     
     while(followers.size < 30) {
       world.addFollower()
