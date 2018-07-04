@@ -28,4 +28,14 @@ case class Vector2D(x: Double, y: Double) {
     Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2))
   }
   
+  //rajoitetaan nopeus maksimiin
+  def limitToMax(maxVel: Double) = {
+      if (this.sizeOf() > maxVel) {
+        val k = maxVel / this.sizeOf()
+        this * k
+      }
+      else
+        this
+  }
+  
 }

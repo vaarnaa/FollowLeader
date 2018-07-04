@@ -46,10 +46,11 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     }
     
     //nopeus ei saa ylittää maksimiarvoa
-    if (arrVel.sizeOf() > maxVel) {
+    /*if (arrVel.sizeOf() > maxVel) {
       val k = maxVel / arrVel.sizeOf()
       arrVel *=  k
-    }
+    }*/
+    arrVel = arrVel.limitToMax(maxVel)
     
     //seinien aiheuttama hylkimisnopeus
     val wallRep = wallRepulsion(arrVel)
@@ -57,29 +58,32 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     var combinedVel = arrVel + wallRep
     
     //nopeus ei saa ylittää maksimiarvoa
-    if (combinedVel.sizeOf() > maxVel) {
+    /*if (combinedVel.sizeOf() > maxVel) {
       val k = maxVel / combinedVel.sizeOf()
       combinedVel = combinedVel * k
-    }
+    }*/
+    combinedVel = combinedVel.limitToMax(maxVel)
     
     //nopeus, jolla väistetään takana olevaa johtajaa
     val velAvoidance = avoidanceVelocity()
     combinedVel += velAvoidance
     
     //nopeus ei saa ylittää maksimiarvoa
-    if (combinedVel.sizeOf() > maxVel) {
+    /*if (combinedVel.sizeOf() > maxVel) {
       val k = maxVel / combinedVel.sizeOf()
       combinedVel = combinedVel * k
-    }
+    }*/
+    combinedVel = combinedVel.limitToMax(maxVel)
     
     //kokonaisnopeuteen lisätään vielä toisten alusten aiheuttama hylkimisnopeus
     var totalVel = combinedVel + separationVelocity()
     
     //nopeus ei saa ylittää maksimiarvoa
-    if (totalVel.sizeOf() > maxVel) {
+    /*if (totalVel.sizeOf() > maxVel) {
       val k = maxVel / totalVel.sizeOf()
       totalVel *= k
-    }
+    }*/
+    totalVel = totalVel.limitToMax(maxVel)
     
     totalVel
     
@@ -101,10 +105,13 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
       
     //lasketaan tarvittava muutosnopeusvektori
     var steerDir = direction + velocity
-    if (steerDir.sizeOf() > world.maxVelChange) { //nopeuden muutos ei saa ylittää maksimiarvoa
+    
+    //nopeuden muutos ei saa ylittää maksimiarvoa
+    /*if (steerDir.sizeOf() > world.maxVelChange) { 
       val k = world.maxVelChange / steerDir.sizeOf()
       steerDir = steerDir * k
-    }
+    }*/
+    steerDir = steerDir.limitToMax(world.maxVelChange)
     
     //lasketaan uusi nopeusvektori
     var newVel = velocity + steerDir
@@ -114,10 +121,11 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     }
     
     //nopeus ei saa ylittää maksimiarvoa
-    if (newVel.sizeOf() > maxVel) {
+    /*if (newVel.sizeOf() > maxVel) {
       val k = maxVel / newVel.sizeOf()
       newVel = newVel * k
-    }
+    }*/
+    newVel = newVel.limitToMax(maxVel)
     
     newVel
     
@@ -193,7 +201,7 @@ class Follower(_world: World, _velocity: Vector2D, _place: Vector2D, _img: Buffe
     
   }
   
-  //alusten toisiinsa kohdistaama hylkimisnopeus
+  //alusten toisiinsa kohdistama hylkimisnopeus
   def separationVelocity() = {
     
     var sepVel = Vector2D(0,0)
