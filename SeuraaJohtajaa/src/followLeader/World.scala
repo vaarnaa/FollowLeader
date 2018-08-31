@@ -1,4 +1,4 @@
-package seuraaJohtajaa
+package followLeader
 
 import scala.collection.mutable.Buffer
 import java.awt.{Graphics2D, Color}
@@ -20,15 +20,18 @@ class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: 
   //kertoo seuraavatko alukset johtajaa vai toisiaan
   var inFleetMode = true
   
+  val leaderImageFileName: String = "alus_musta.png"
+  val followerImageFileName: String = "alus2.png"
+  
   //johtaja-aluksen kuva
   val imgLeader = {
     try {
-           ImageIO.read(new File("alus_musta.png"))
+           ImageIO.read(new File(leaderImageFileName))
           
         } 
       catch {
         case e: IOException => {
-          println("Couldn't load image: alus_musta.png")
+          println(s"Couldn't load image: $leaderImageFileName")
           println("Closing program")
           sys.exit(0)  
         }
@@ -38,12 +41,12 @@ class World(val height: Int, val width: Int, var maxVelocity: Double, var mass: 
   //seuraaja-aluksen kuva
   val imgFollower = {
     try {
-           ImageIO.read(new File("alus2.png"))
+           ImageIO.read(new File(followerImageFileName))
           
         } 
       catch {
         case e: IOException => {
-          println("Couldn't load image: alus2.png")
+          println(s"Couldn't load image: $followerImageFileName")
           println("Closing program")
           sys.exit(0)  
         }

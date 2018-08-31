@@ -1,6 +1,6 @@
-package seuraaJohtajaa
+package followLeaderTest
 
-import seuraaJohtajaa._
+import followLeader._
 import java.awt.image.BufferedImage
 import org.scalatest.Assertions._
 import org.scalatest.FlatSpec

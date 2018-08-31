@@ -1,4 +1,4 @@
-package seuraaJohtajaa
+package followLeader
 
 import scala.swing._
 import scala.swing.event._
@@ -14,7 +14,7 @@ import java.awt.geom.Ellipse2D
 //luokka uuden pääikkunan luomiseksi
 class Canvas(var gameState: Int, var gameWorld: World, defaultHeight: Int, defaultWidth: Int, defaultMaxVelocity: Double, defaultMass: Double) extends MainFrame {
     
-    title     = "Seuraa johtajaa"
+    title     = "Follow leader"
     resizable = false
     
     var gameArea = new Arena(defaultWidth, defaultHeight)

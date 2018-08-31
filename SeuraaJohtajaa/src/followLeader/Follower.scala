@@ -1,4 +1,4 @@
-package seuraaJohtajaa
+package followLeader
 
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage

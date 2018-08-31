@@ -1,4 +1,4 @@
-package seuraaJohtajaa
+package followLeader
 
 //vektoriluokka, joka kuvaa nopeuksia ja paikkoja simulaatioalueessa
 case class Vector2D(x: Double, y: Double) {
